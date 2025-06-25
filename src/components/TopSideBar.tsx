@@ -19,9 +19,12 @@ import { useState } from "react";
 import logo from "../assets/logo.png";
 import profile from "../assets/profile.jpg";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const TopSideBar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+  
   const dashboard = () => {
     navigate("/dashboard");
   };
@@ -52,7 +55,12 @@ const TopSideBar = () => {
   const support = () => {
     navigate("/support");
   };
-  const logout = () => {
+  const myProfile = () => {
+    navigate("/myprofile");
+  };
+  
+  const handleLogout = () => {
+    logout();
     navigate("/");
   };
 
@@ -60,6 +68,7 @@ const TopSideBar = () => {
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
+  
   return (
     <>
       <div className="top_strip">
@@ -94,7 +103,7 @@ const TopSideBar = () => {
             </button>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="#" onClick={myProfile}>
                   {" "}
                   <User></User> My Profile{" "}
                 </a>
@@ -105,7 +114,7 @@ const TopSideBar = () => {
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="#" onClick={handleLogout}>
                   <LogOut></LogOut> Log Out
                 </a>
               </li>
@@ -217,7 +226,7 @@ const TopSideBar = () => {
               <Headphones></Headphones>
               Support
             </li>
-            <li className="text-red" onClick={logout}>
+            <li className="text-red" onClick={handleLogout}>
               <LogOut></LogOut>
               Log Out
             </li>
