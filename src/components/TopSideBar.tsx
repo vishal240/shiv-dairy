@@ -15,16 +15,18 @@ import {
   Headphones,
   Circle,
 } from "react-feather";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import profile from "../assets/profile.jpg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useLocation } from "react-router-dom";
 
 const TopSideBar = () => {
   const navigate = useNavigate();
+  const locations = useLocation();
   const { logout } = useAuth();
-  
+
   const dashboard = () => {
     navigate("/dashboard");
   };
@@ -58,17 +60,18 @@ const TopSideBar = () => {
   const myProfile = () => {
     navigate("/myprofile");
   };
-  
+
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
   const toggleSidebar = () => {
     setSidebarOpen((prev) => !prev);
   };
-  
+
   return (
     <>
       <div className="top_strip">
@@ -128,11 +131,17 @@ const TopSideBar = () => {
         </div>
         <div className="menus pt-0 pt-md-4">
           <ul className="pt-1">
-            <li className="active" onClick={dashboard}>
+            <li
+              className={locations.pathname === "/dashboard" ? "active" : ""}
+              onClick={dashboard}
+            >
               <PieChart></PieChart>
               Dashboard
             </li>
-            <li className="" onClick={stores}>
+            <li
+              className={locations.pathname === "/stores" ? "active" : ""}
+              onClick={stores}
+            >
               <Tv></Tv>
               Stores
             </li>
@@ -162,13 +171,28 @@ const TopSideBar = () => {
                   >
                     <div className="accordion-body px-2 pb-2 pt-1">
                       <ul className="sub_menu">
-                        <li onClick={products}>
+                        <li
+                          className={
+                            locations.pathname === "/products" ? "active" : ""
+                          }
+                          onClick={products}
+                        >
                           <Circle></Circle>Products
                         </li>
-                        <li onClick={categories}>
+                        <li
+                          className={
+                            locations.pathname === "/categories" ? "active" : ""
+                          }
+                          onClick={categories}
+                        >
                           <Circle></Circle>Categories
                         </li>
-                        <li onClick={brands}>
+                        <li
+                          className={
+                            locations.pathname === "/brands" ? "active" : ""
+                          }
+                          onClick={brands}
+                        >
                           <Circle></Circle>Brands
                         </li>
                       </ul>
@@ -203,13 +227,30 @@ const TopSideBar = () => {
                   >
                     <div className="accordion-body px-2 pb-2 pt-1">
                       <ul className="sub_menu">
-                        <li onClick={orders}>
+                        <li
+                          className={
+                            locations.pathname === "/orders" ? "active" : ""
+                          }
+                          onClick={orders}
+                        >
                           <Circle></Circle>Orders
                         </li>
-                        <li onClick={customers}>
+                        <li
+                          className={
+                            locations.pathname === "/customers" ? "active" : ""
+                          }
+                          onClick={customers}
+                        >
                           <Circle></Circle>Customers
                         </li>
-                        <li onClick={transactions}>
+                        <li
+                          className={
+                            locations.pathname === "/transactions"
+                              ? "active"
+                              : ""
+                          }
+                          onClick={transactions}
+                        >
                           <Circle></Circle>Transactions
                         </li>
                       </ul>
@@ -218,11 +259,17 @@ const TopSideBar = () => {
                 </div>
               </div>
             </li>
-            <li className="" onClick={purchase}>
+            <li
+              className={locations.pathname === "/purchase" ? "active" : ""}
+              onClick={purchase}
+            >
               <Package></Package>
               Purchase
             </li>
-            <li className="" onClick={support}>
+            <li
+              className={locations.pathname === "/support" ? "active" : ""}
+              onClick={support}
+            >
               <Headphones></Headphones>
               Support
             </li>
