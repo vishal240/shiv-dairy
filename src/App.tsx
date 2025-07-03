@@ -4,6 +4,10 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 
+// Layouts
+import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
+import PublicLayout from "./layouts/PublicLayout";
+
 // Auth pages
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
@@ -43,141 +47,45 @@ function App() {
           {/* Public routes - only accessible when NOT authenticated */}
           <Route path="/" element={
             <PublicRoute>
-              <Login />
+              <PublicLayout />
             </PublicRoute>
-          } />
-          <Route path="/forgot" element={
-            <PublicRoute>
-              <ForgotPassword />
-            </PublicRoute>
-          } />
-          <Route path="/reset" element={
-            <PublicRoute>
-              <ResetPassword />
-            </PublicRoute>
-          } />
+          }>
+            <Route index element={<Login />} />
+            <Route path="forgot" element={<ForgotPassword />} />
+            <Route path="reset" element={<ResetPassword />} />
+          </Route>
 
           {/* Protected routes - only accessible when authenticated */}
-          <Route path="/dashboard" element={
+          <Route path="/" element={
             <ProtectedRoute>
-              <Dashboard />
+              <AuthenticatedLayout />
             </ProtectedRoute>
-          } />
-          <Route path="/orders" element={
-            <ProtectedRoute>
-              <Orders />
-            </ProtectedRoute>
-          } />
-          <Route path="/stores" element={
-            <ProtectedRoute>
-              <Stores />
-            </ProtectedRoute>
-          } />
-          <Route path="/products" element={
-            <ProtectedRoute>
-              <Products />
-            </ProtectedRoute>
-          } />
-          <Route path="/categories" element={
-            <ProtectedRoute>
-              <Categories />
-            </ProtectedRoute>
-          } />
-          <Route path="/brands" element={
-            <ProtectedRoute>
-              <Brands />
-            </ProtectedRoute>
-          } />
-          <Route path="/transactions" element={
-            <ProtectedRoute>
-              <Transactions />
-            </ProtectedRoute>
-          } />
-          <Route path="/customers" element={
-            <ProtectedRoute>
-              <Customers />
-            </ProtectedRoute>
-          } />
-          <Route path="/purchase" element={
-            <ProtectedRoute>
-              <Purchase />
-            </ProtectedRoute>
-          } />
-          <Route path="/support" element={
-            <ProtectedRoute>
-              <Support />
-            </ProtectedRoute>
-          } />
-          <Route path="/addstore" element={
-            <ProtectedRoute>
-              <AddStore />
-            </ProtectedRoute>
-          } />
-          <Route path="/viewstore" element={
-            <ProtectedRoute>
-              <ViewStore />
-            </ProtectedRoute>
-          } />
-          <Route path="/addorder" element={
-            <ProtectedRoute>
-              <AddOrder />
-            </ProtectedRoute>
-          } />
-          <Route path="/selectstore" element={
-            <ProtectedRoute>
-              <SelectStore />
-            </ProtectedRoute>
-          } />
-          <Route path="/checkout" element={
-            <ProtectedRoute>
-              <Checkout />
-            </ProtectedRoute>
-          } />
-          <Route path="/addproduct" element={
-            <ProtectedRoute>
-              <AddProduct />
-            </ProtectedRoute>
-          } />
-          <Route path="/orderdetails" element={
-            <ProtectedRoute>
-              <OrderDetails />
-            </ProtectedRoute>
-          } />
-          <Route path="/addcategories" element={
-            <ProtectedRoute>
-              <AddCategories />
-            </ProtectedRoute>
-          } />
-          <Route path="/addbrands" element={
-            <ProtectedRoute>
-              <AddBrands />
-            </ProtectedRoute>
-          } />
-          <Route path="/addcustomer" element={
-            <ProtectedRoute>
-              <AddCustomer />
-            </ProtectedRoute>
-          } />
-          <Route path="/addpurchase" element={
-            <ProtectedRoute>
-              <AddPurchase />
-            </ProtectedRoute>
-          } />
-          <Route path="/myprofile" element={
-            <ProtectedRoute>
-              <Myprofile />
-            </ProtectedRoute>
-          } />
-          <Route path="/customerdetails" element={
-            <ProtectedRoute>
-              <CustomerDetails />
-            </ProtectedRoute>
-          } />
-          <Route path="/invoice" element={
-            <ProtectedRoute>
-              <Invoice />
-            </ProtectedRoute>
-          } />
+          }>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="stores" element={<Stores />} />
+            <Route path="products" element={<Products />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="brands" element={<Brands />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="purchase" element={<Purchase />} />
+            <Route path="support" element={<Support />} />
+            <Route path="addstore" element={<AddStore />} />
+            <Route path="viewstore" element={<ViewStore />} />
+            <Route path="addorder" element={<AddOrder />} />
+            <Route path="selectstore" element={<SelectStore />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="addproduct" element={<AddProduct />} />
+            <Route path="orderdetails" element={<OrderDetails />} />
+            <Route path="addcategories" element={<AddCategories />} />
+            <Route path="addbrands" element={<AddBrands />} />
+            <Route path="addcustomer" element={<AddCustomer />} />
+            <Route path="addpurchase" element={<AddPurchase />} />
+            <Route path="myprofile" element={<Myprofile />} />
+            <Route path="customerdetails" element={<CustomerDetails />} />
+            <Route path="invoice" element={<Invoice />} />
+          </Route>
         </Routes>
       </Router>
     </AuthProvider>
