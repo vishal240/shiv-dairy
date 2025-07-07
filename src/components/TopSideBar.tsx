@@ -7,56 +7,51 @@ import {
   User,
   Settings,
   LogOut,
-  PieChart,
-  Tv,
-  Box,
-  ShoppingBag,
-  Package,
-  Headphones,
-  Circle,
 } from "react-feather";
-import { useEffect, useState } from "react";
+
+import { Fragment, useEffect, useState } from "react";
 import logo from "../assets/logo.png";
-import profile from "../assets/profile.jpg";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
+import ApiService from "../services/api";
+import Icons from "./Icons";
 
 const TopSideBar = () => {
+  const [menuList, setmenuList] = useState<any>([]);
+  const [adminDetails, setadminDetails] = useState<any>("");
   const navigate = useNavigate();
   const locations = useLocation();
   const { logout } = useAuth();
+  useEffect(() => {
+    getMenus();
+    getAdminDetails();
+  }, []);
+  const getAdminDetails = async () => {
+    try {
+      await ApiService.post("/admin/getAdminDetails", {}).then(
+        (response: any) => {
+          if (response.status === 200) {
+            setadminDetails(response.data);
+          }
+        }
+      );
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+  const getMenus = async () => {
+    try {
+      await ApiService.post("/admin/getMenuList", {}).then((response: any) => {
+        if (response.status === 200) {
+          setmenuList(response.data);
+        }
+      });
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
 
-  const dashboard = () => {
-    navigate("/dashboard");
-  };
-  const stores = () => {
-    navigate("/stores");
-  };
-  const orders = () => {
-    navigate("/orders");
-  };
-  const products = () => {
-    navigate("/products");
-  };
-  const categories = () => {
-    navigate("/categories");
-  };
-  const brands = () => {
-    navigate("/brands");
-  };
-  const transactions = () => {
-    navigate("/transactions");
-  };
-  const customers = () => {
-    navigate("/customers");
-  };
-  const purchase = () => {
-    navigate("/purchase");
-  };
-  const support = () => {
-    navigate("/support");
-  };
   const myProfile = () => {
     navigate("/myprofile");
   };
@@ -97,10 +92,10 @@ const TopSideBar = () => {
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              <img src={profile}></img>
+              <img src={adminDetails?.profile_image_url}></img>
               <div className="text-left">
-                <b>Shiv Dairy</b>
-                <label>Admin</label>
+                <b>{adminDetails?.admin_name}</b>
+                <label>{adminDetails?.user_type}</label>
               </div>
               <ChevronDown size={18}></ChevronDown>
             </button>
@@ -131,148 +126,67 @@ const TopSideBar = () => {
         </div>
         <div className="menus pt-0 pt-md-4">
           <ul className="pt-1">
-            <li
-              className={locations.pathname === "/dashboard" ? "active" : ""}
-              onClick={dashboard}
-            >
-              <PieChart></PieChart>
-              Dashboard
-            </li>
-            <li
-              className={locations.pathname === "/stores" ? "active" : ""}
-              onClick={stores}
-            >
-              <Tv></Tv>
-              Stores
-            </li>
-            <li className=" p-0">
-              <div
-                className="accordion accordion-flush w-100 bg-trans"
-                id="accordionFlushExample"
-              >
-                <div className="accordion-item bg-trans">
-                  <h2 className="accordion-header bg-trans">
-                    <button
-                      className="accordion-button bg-trans collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#flush-collapseOne"
-                      aria-expanded="false"
-                      aria-controls="flush-collapseOne"
-                    >
-                      <Box></Box>
-                      Product Management
-                    </button>
-                  </h2>
-                  <div
-                    id="flush-collapseOne"
-                    className="accordion-collapse collapse"
-                    data-bs-parent="#accordionFlushExample"
+            {menuList.map((item: any, index: any) => (
+              <Fragment key={index}>
+                {item.submenu.length == 0 && (
+                  <li
+                    className={
+                      locations.pathname === item.menu_url ? "active" : ""
+                    }
+                    onClick={() => navigate(item.menu_url)}
                   >
-                    <div className="accordion-body px-2 pb-2 pt-1">
-                      <ul className="sub_menu">
-                        <li
-                          className={
-                            locations.pathname === "/products" ? "active" : ""
-                          }
-                          onClick={products}
-                        >
-                          <Circle></Circle>Products
-                        </li>
-                        <li
-                          className={
-                            locations.pathname === "/categories" ? "active" : ""
-                          }
-                          onClick={categories}
-                        >
-                          <Circle></Circle>Categories
-                        </li>
-                        <li
-                          className={
-                            locations.pathname === "/brands" ? "active" : ""
-                          }
-                          onClick={brands}
-                        >
-                          <Circle></Circle>Brands
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li className=" p-0">
-              <div
-                className="accordion accordion-flush w-100 bg-trans"
-                id="accordionFlushExample2"
-              >
-                <div className="accordion-item bg-trans">
-                  <h2 className="accordion-header bg-trans">
-                    <button
-                      className="accordion-button bg-trans collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#flush-collapseOne2"
-                      aria-expanded="false"
-                      aria-controls="flush-collapseOne"
+                    <Icons item={item.icon} /> {item.menu_name}
+                  </li>
+                )}
+                {item.submenu.length > 0 && (
+                  <li className=" p-0">
+                    <div
+                      className="accordion accordion-flush w-100 bg-trans"
+                      id={`accordionFlushExample${index}`}
                     >
-                      <ShoppingBag></ShoppingBag>
-                      Order Management
-                    </button>
-                  </h2>
-                  <div
-                    id="flush-collapseOne2"
-                    className="accordion-collapse collapse"
-                    data-bs-parent="#accordionFlushExample2"
-                  >
-                    <div className="accordion-body px-2 pb-2 pt-1">
-                      <ul className="sub_menu">
-                        <li
-                          className={
-                            locations.pathname === "/orders" ? "active" : ""
-                          }
-                          onClick={orders}
+                      <div className="accordion-item bg-trans">
+                        <h2 className="accordion-header bg-trans">
+                          <button
+                            className="accordion-button bg-trans collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target={`#flush-collapseOne${index}`}
+                            aria-expanded="false"
+                            aria-controls={`flush-collapseOne${index}`}
+                          >
+                            <Icons item={item.icon} /> {item.menu_name}
+                          </button>
+                        </h2>
+                        <div
+                          id={`flush-collapseOne${index}`}
+                          className="accordion-collapse collapse"
+                          data-bs-parent={`#accordionFlushExample${index}`}
                         >
-                          <Circle></Circle>Orders
-                        </li>
-                        <li
-                          className={
-                            locations.pathname === "/customers" ? "active" : ""
-                          }
-                          onClick={customers}
-                        >
-                          <Circle></Circle>Customers
-                        </li>
-                        <li
-                          className={
-                            locations.pathname === "/transactions"
-                              ? "active"
-                              : ""
-                          }
-                          onClick={transactions}
-                        >
-                          <Circle></Circle>Transactions
-                        </li>
-                      </ul>
+                          <div className="accordion-body px-2 pb-2 pt-1">
+                            <ul className="sub_menu">
+                              {item.submenu.map((item1: any, index1: any) => (
+                                <li
+                                  key={index1}
+                                  className={
+                                    locations.pathname === item1.menu_url
+                                      ? "active"
+                                      : ""
+                                  }
+                                  onClick={() => navigate(item1.menu_url)}
+                                >
+                                  <Icons item={item1.icon} /> {item1.menu_name}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li
-              className={locations.pathname === "/purchase" ? "active" : ""}
-              onClick={purchase}
-            >
-              <Package></Package>
-              Purchase
-            </li>
-            <li
-              className={locations.pathname === "/support" ? "active" : ""}
-              onClick={support}
-            >
-              <Headphones></Headphones>
-              Support
-            </li>
+                  </li>
+                )}
+              </Fragment>
+            ))}
+
             <li className="text-red" onClick={handleLogout}>
               <LogOut></LogOut>
               Log Out

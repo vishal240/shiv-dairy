@@ -6,8 +6,16 @@ import {
   UploadCloud,
   X,
 } from "react-feather";
+import { useNavigate } from "react-router-dom";
 
-const ImportExport = () => {
+interface ImportExportProps {
+  onAdd: string;
+  onImport: () => void;
+  onExport: () => void;
+}
+
+const ImportExport = ({ onAdd, onImport, onExport }: ImportExportProps) => {
+  const navigate = useNavigate();
   return (
     <>
       <span className="gap-10 d-flex align-items-center justify-content-md-end">
@@ -18,11 +26,11 @@ const ImportExport = () => {
         >
           <UploadCloud></UploadCloud> Import
         </button>
-        <button className="btn_imprt">
+        <button className="btn_imprt" onClick={onExport}>
           <DownloadCloud></DownloadCloud> Export
         </button>
-        <button className="black_btn">
-          <Plus></Plus> Add New
+        <button className="black_btn" onClick={() => navigate(onAdd)}>
+          <Plus /> Add New
         </button>
       </span>
 
@@ -50,11 +58,11 @@ const ImportExport = () => {
               </p>
 
               <div className="d-flex justify-content-end gap-10">
-                <button className="btn_imprt">
+                <button className="btn_imprt" onClick={onImport}>
                   {" "}
                   <X></X> Cancel
                 </button>
-                <button className="black_btn">
+                <button className="black_btn" onClick={onImport}>
                   {" "}
                   <Check></Check> Upload
                 </button>

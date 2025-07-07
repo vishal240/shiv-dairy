@@ -1,5 +1,10 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -45,22 +50,28 @@ function App() {
       <Router>
         <Routes>
           {/* Public routes - only accessible when NOT authenticated */}
-          <Route path="/" element={
-            <PublicRoute>
-              <PublicLayout />
-            </PublicRoute>
-          }>
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <PublicLayout />
+              </PublicRoute>
+            }
+          >
             <Route index element={<Login />} />
             <Route path="forgot" element={<ForgotPassword />} />
             <Route path="reset" element={<ResetPassword />} />
           </Route>
 
           {/* Protected routes - only accessible when authenticated */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <AuthenticatedLayout />
-            </ProtectedRoute>
-          }>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <AuthenticatedLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="orders" element={<Orders />} />
             <Route path="stores" element={<Stores />} />
@@ -86,6 +97,7 @@ function App() {
             <Route path="customerdetails" element={<CustomerDetails />} />
             <Route path="invoice" element={<Invoice />} />
           </Route>
+          <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -1,8 +1,8 @@
 import axios, { type AxiosRequestConfig } from "axios";
-
+import { API_BASE_URL } from "../config";
 // Create an axios instance with a mock base URL
 export const api = axios.create({
-  baseURL: "https://api.example.com", // This would be your real API in production
+  baseURL: API_BASE_URL, // This would be your real API in production
   timeout: 10000,
 });
 
@@ -28,7 +28,7 @@ api.interceptors.response.use(
       if (error.response.status === 401) {
         // Unauthorized - token expired or invalid
         localStorage.removeItem("authToken");
-        window.location.href = "/login";
+        window.location.href = "/";
       }
     } else if (error.request) {
       // Request was made but no response received

@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Input from "../components/inputs/Input";
 import type { LoginFormData } from "../Model/login";
+import ApiService from "../services/api";
 
 const schema = yup.object({
   email: yup
@@ -36,20 +37,14 @@ const Login = () => {
     setLoading(true);
     setError("");
     try {
-      // Simulate API call - replace with your actual authentication logic
-      if (
-        data.email === "admin@shivdairy.com" &&
-        data.password === "password123"
-      ) {
-        // Generate a mock token - replace with actual token from your API
-        const mockToken = "mock-jwt-token-" + Date.now();
-        login(mockToken);
-        navigate("/dashboard");
-      } else {
-        setError("Invalid email or password");
-      }
-    } catch (err) {
-      setError("An error occurred during login");
+      await ApiService.post("/admin/loginAdmin", data).then((response: any) => {
+        if (response.status === 200) {
+          login(response.data.token);
+          navigate("/dashboard");
+        }
+      });
+    } catch (err: any) {
+      setError(err.response.data.message);
     } finally {
       setLoading(false);
     }
@@ -125,13 +120,6 @@ const Login = () => {
           >
             {loading ? "Signing in..." : "Submit"}
           </button>
-        </div>
-        <div style={{ marginTop: "15px", fontSize: "11px", color: "#737791" }}>
-          <p>
-            <strong>Demo Credentials:</strong>
-          </p>
-          <p>Email: admin@shivdairy.com</p>
-          <p>Password: password123</p>
         </div>
       </div>
     </section>
