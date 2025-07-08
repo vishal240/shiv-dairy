@@ -1,21 +1,120 @@
-import { Check, ChevronLeft, ChevronRight, Trash } from "react-feather";
+import { Trash } from "react-feather";
 import Filters from "../components/Filters";
 import Search from "../components/Search";
 import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
 import Actions from "../components/Actions";
+import Table, { type TableColumn, type TableRow } from "../components/Table/Table";
+import Pagination from "../components/Pagination/Pagination";
+import { usePagination } from "../hooks/usePagination";
+import { useTableSelection } from "../hooks/useTableSelection";
 import { useEffect, useState } from "react";
 import ApiService from "../services/api";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  // Transform categories data for table
+  const tableData: TableRow[] = categories.map((category: any, index: number) => ({
+    id: category.id || index,
+    name: category.product_category_name,
+    description: "Description is optional",
+    dateAdded: "24/10/2025",
+    status: "Active"
+  }));
+
+  // Pagination hook
+  const {
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    paginatedData,
+    goToPage
+  } = usePagination({
+    data: tableData,
+    itemsPerPage: 5
+  });
+
+  // Selection hook
+  const {
+    selectedRows,
+    selectRow,
+    toggleSelectAll,
+    getSelectedCount
+  } = useTableSelection();
+
+  // Table columns configuration
+  const columns: TableColumn[] = [
+    {
+      key: 'name',
+      label: 'Categories Name',
+      sortable: true,
+      width: '40%'
+    },
+    {
+      key: 'dateAdded',
+      label: 'Added',
+      sortable: true,
+      width: '20%'
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      width: '20%'
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      width: '20%',
+      align: 'center'
+    }
+  ];
+
+  // Custom cell renderer
+  const renderCell = (column: TableColumn, row: TableRow, value: any) => {
+    switch (column.key) {
+      case 'name':
+        return (
+          <div className="d-flex align-items-center">
+            <div>
+              <p className="products_name">{value}</p>
+              <span className="sku">{row.description}</span>
+            </div>
+          </div>
+        );
+      case 'status':
+        return <span className="status in">{value}</span>;
+      case 'actions':
+        return <Actions />;
+      default:
+        return value;
+    }
+  };
+
+  // Handle row selection
+  const handleRowSelect = (rowId: string | number) => {
+    selectRow(rowId);
+  };
+
+  // Handle select all
+  const handleSelectAll = (selected: boolean) => {
+    const allRowIds = paginatedData.map(row => row.id);
+    toggleSelectAll(allRowIds);
+  };
+
   useEffect(() => {
     getCategories();
   }, []);
+
   const getCategories = () => {
+    setLoading(true);
     ApiService.post("/admin/getCategoryList", {}).then((res: any) => {
       console.log(res);
       setCategories(res.data);
+    }).finally(() => {
+      setLoading(false);
     });
   };
 
@@ -49,84 +148,40 @@ const Categories = () => {
                 <Search></Search>
                 <Filters></Filters>
                 <DateRangePicker></DateRangePicker>
-                <button className="common-button text-red">
+                <button 
+                  className="common-button text-red"
+                  disabled={getSelectedCount() === 0}
+                  style={{ 
+                    opacity: getSelectedCount() === 0 ? 0.5 : 1,
+                    cursor: getSelectedCount() === 0 ? 'not-allowed' : 'pointer'
+                  }}
+                >
                   <Trash></Trash>
-                  Delete
+                  Delete ({getSelectedCount()})
                 </button>
               </div>
             </div>
-            <table className="data_table">
-              <thead>
-                <tr>
-                  <th>
-                    <input
-                      id="chx"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx">
-                      <Check></Check>
-                    </label>
-                  </th>
-
-                  <th>Categories Name</th>
-                  <th>Added</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((category: any, index: any) => (
-                  <tr key={index}>
-                    <td>
-                      <input
-                        id="chx2"
-                        className="chx_input"
-                        type="checkbox"
-                      ></input>
-                      <label className="chx_lbl" htmlFor="chx2">
-                        <Check></Check>
-                      </label>
-                    </td>
-
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <div className="">
-                          <p className="products_name">
-                            {category.product_category_name}
-                          </p>
-                          <span className="sku">Discription is optional</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>24/10/2025</td>
-
-                    <td>
-                      <span className="status in">Active</span>
-                    </td>
-                    <td>
-                      <Actions></Actions>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="table_footer mt-3">
-              <p className="row_counts">Showing 1-5 from 15</p>
-              <div className="pagination">
-                <button>
-                  <ChevronLeft></ChevronLeft>
-                </button>
-                <ul>
-                  <li>1</li>
-                  <li className="active">2</li>
-                  <li>3</li>
-                </ul>
-                <button>
-                  <ChevronRight></ChevronRight>
-                </button>
-              </div>
-            </div>
+            
+            <Table
+              columns={columns}
+              data={paginatedData}
+              loading={loading}
+              selectable={true}
+              selectedRows={selectedRows}
+              onRowSelect={handleRowSelect}
+              onSelectAll={handleSelectAll}
+              renderCell={renderCell}
+              emptyMessage="No categories found"
+            />
+            
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={goToPage}
+              showInfo={true}
+            />
           </div>
         </div>
       </div>
