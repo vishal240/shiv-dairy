@@ -27,7 +27,11 @@ const Purchase = () => {
           </div>
         </div>
         <div className="col-md-6 pt-3">
-          <ImportExport></ImportExport>
+          <ImportExport
+            onAdd={""}
+            onImport={() => {}}
+            onExport={() => {}}
+          ></ImportExport>
         </div>
       </div>
 

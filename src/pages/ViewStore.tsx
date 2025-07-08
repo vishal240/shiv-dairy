@@ -56,8 +56,7 @@ const ViewStore = () => {
                   <div>
                     <p className="font-12 color-grey mb-0">Address</p>
                     <p className="font-12">
-                      315, Annapurna Road, Cipla Complex, Indore, (M.p)
-                      452001
+                      315, Annapurna Road, Cipla Complex, Indore, (M.p) 452001
                     </p>
                   </div>
                 </div>
@@ -76,7 +75,11 @@ const ViewStore = () => {
           </div>
         </div>
         <div className="col-md-6 pt-3">
-          <ImportExport></ImportExport>
+          <ImportExport
+            onAdd={"/addproduct"}
+            onImport={() => {}}
+            onExport={() => {}}
+          ></ImportExport>
         </div>
       </div>
       <div className="row px-2 py-3">

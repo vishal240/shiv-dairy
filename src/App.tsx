@@ -47,7 +47,7 @@ import Invoice from "./pages/Invoice";
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/shivdairyadmin">
         <Routes>
           {/* Public routes - only accessible when NOT authenticated */}
           <Route

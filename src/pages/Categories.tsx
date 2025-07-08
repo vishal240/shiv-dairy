@@ -4,8 +4,21 @@ import Search from "../components/Search";
 import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
 import Actions from "../components/Actions";
+import { useEffect, useState } from "react";
+import ApiService from "../services/api";
 
 const Categories = () => {
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    getCategories();
+  }, []);
+  const getCategories = () => {
+    ApiService.post("/admin/getCategoryList", {}).then((res: any) => {
+      console.log(res);
+      setCategories(res.data);
+    });
+  };
+
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
@@ -17,7 +30,11 @@ const Categories = () => {
           </div>
         </div>
         <div className="col-md-6 pt-3">
-          <ImportExport></ImportExport>
+          <ImportExport
+            onAdd={"/addcategories"}
+            onImport={() => {}}
+            onExport={() => {}}
+          ></ImportExport>
         </div>
       </div>
       <div className="row px-2 py-3">
@@ -59,93 +76,39 @@ const Categories = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
+                {categories.map((category: any, index: any) => (
+                  <tr key={index}>
+                    <td>
+                      <input
+                        id="chx2"
+                        className="chx_input"
+                        type="checkbox"
+                      ></input>
+                      <label className="chx_lbl" htmlFor="chx2">
+                        <Check></Check>
+                      </label>
+                    </td>
 
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Butter Milk</p>
-                        <span className="sku">Discription is optional</span>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <div className="">
+                          <p className="products_name">
+                            {category.product_category_name}
+                          </p>
+                          <span className="sku">Discription is optional</span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
+                    </td>
+                    <td>24/10/2025</td>
 
-                  <td>
-                    <span className="status in">Active</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Butter Milk</p>
-                        <span className="sku">Discription is optional</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
-
-                  <td>
-                    <span className="status in">Active</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Butter Milk</p>
-                        <span className="sku">Discription is optional</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
-
-                  <td>
-                    <span className="status in">Active</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
+                    <td>
+                      <span className="status in">Active</span>
+                    </td>
+                    <td>
+                      <Actions></Actions>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
             <div className="table_footer mt-3">

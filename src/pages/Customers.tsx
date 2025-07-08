@@ -17,7 +17,11 @@ const Customers = () => {
           </div>
         </div>
         <div className="col-md-6 pt-3">
-          <ImportExport></ImportExport>
+          <ImportExport
+            onAdd={"/addcustomer"}
+            onImport={() => {}}
+            onExport={() => {}}
+          ></ImportExport>
         </div>
       </div>
       <div className="row px-2 py-3">

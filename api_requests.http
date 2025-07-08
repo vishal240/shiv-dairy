@@ -1,0 +1,7 @@
+POST https://thenoblewholesale.com:8000/v1/admin/loginAdmin
+   Content-Type: application/json
+
+   {
+       "email": "admin@shivdairy.com",
+       "password": "password123"
+   }

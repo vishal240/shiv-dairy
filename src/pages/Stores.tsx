@@ -7,10 +7,11 @@ import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
 import { useEffect, useState } from "react";
 import ApiService from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const Stores = () => {
   const [stores, setStores] = useState<any>([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchStores();
   }, []);
@@ -107,7 +108,10 @@ const Stores = () => {
                   </div>
                   <div className="d-flex gap-10">
                     <button className="black_btn w-100">Go To Dashboard</button>
-                    <button className="common-button w-100">
+                    <button
+                      className="common-button w-100"
+                      onClick={() => navigate("/viewstore")}
+                    >
                       View Details
                     </button>
                   </div>

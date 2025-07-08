@@ -20,57 +20,57 @@ const storeSchema = yup.object({
     .required("Store name is required")
     .min(2, "Store name must be at least 2 characters")
     .max(100, "Store name must not exceed 100 characters"),
-  
+
   storeDescription: yup
     .string()
     .required("Store description is required")
     .min(10, "Description must be at least 10 characters")
     .max(500, "Description must not exceed 500 characters"),
-  
+
   primaryPhone: yup
     .string()
     .required("Primary phone is required")
     .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
-  
+
   primaryEmail: yup
     .string()
     .required("Primary email is required")
     .email("Please enter a valid email address"),
-  
+
   secondaryPhone: yup
     .string()
     .optional()
     .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
-  
+
   secondaryEmail: yup
     .string()
     .optional()
     .email("Please enter a valid email address"),
-  
+
   address: yup
     .string()
     .required("Address is required")
     .min(10, "Address must be at least 10 characters")
     .max(200, "Address must not exceed 200 characters"),
-  
+
   city: yup
     .string()
     .required("City is required")
     .min(2, "City must be at least 2 characters")
     .max(50, "City must not exceed 50 characters"),
-  
+
   state: yup
     .string()
     .required("State is required")
     .min(2, "State must be at least 2 characters")
     .max(50, "State must not exceed 50 characters"),
-  
+
   country: yup
     .string()
     .required("Country is required")
     .min(2, "Country must be at least 2 characters")
     .max(50, "Country must not exceed 50 characters"),
-  
+
   zipCode: yup
     .string()
     .required("ZIP code is required")
@@ -82,41 +82,41 @@ const storeSchema = yup.object({
     .required("Owner name is required")
     .min(2, "Owner name must be at least 2 characters")
     .max(100, "Owner name must not exceed 100 characters"),
-  
+
   ownerEmail: yup
     .string()
     .required("Owner email is required")
     .email("Please enter a valid email address"),
-  
+
   ownerPhone: yup
     .string()
     .required("Owner phone is required")
     .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
-  
+
   ownerAddress: yup
     .string()
     .required("Owner address is required")
     .min(10, "Address must be at least 10 characters")
     .max(200, "Address must not exceed 200 characters"),
-  
+
   ownerCity: yup
     .string()
     .required("Owner city is required")
     .min(2, "City must be at least 2 characters")
     .max(50, "City must not exceed 50 characters"),
-  
+
   ownerState: yup
     .string()
     .required("Owner state is required")
     .min(2, "State must be at least 2 characters")
     .max(50, "State must not exceed 50 characters"),
-  
+
   ownerCountry: yup
     .string()
     .required("Owner country is required")
     .min(2, "Country must be at least 2 characters")
     .max(50, "Country must not exceed 50 characters"),
-  
+
   ownerZipCode: yup
     .string()
     .required("Owner ZIP code is required")
@@ -128,8 +128,11 @@ const storeSchema = yup.object({
     .required("User ID is required")
     .min(3, "User ID must be at least 3 characters")
     .max(50, "User ID must not exceed 50 characters")
-    .matches(/^[a-zA-Z0-9_]+$/, "User ID can only contain letters, numbers, and underscores"),
-  
+    .matches(
+      /^[a-zA-Z0-9_]+$/,
+      "User ID can only contain letters, numbers, and underscores"
+    ),
+
   password: yup
     .string()
     .required("Password is required")
@@ -138,16 +141,14 @@ const storeSchema = yup.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
     ),
-  
+
   confirmPassword: yup
     .string()
     .required("Please confirm your password")
     .oneOf([yup.ref("password")], "Passwords must match"),
 
   // Status
-  status: yup
-    .string()
-    .required("Status is required"),
+  status: yup.string().required("Status is required"),
 });
 
 const statusOptions = [
@@ -166,7 +167,7 @@ const AddStore = () => {
     formState: { errors },
     reset,
   } = useForm<StoreFormData>({
-    resolver: yupResolver(storeSchema),
+    resolver: yupResolver(storeSchema) as any,
     defaultValues: {
       status: "active",
     },
@@ -177,23 +178,23 @@ const AddStore = () => {
     try {
       // Create FormData for file uploads
       const formData = new FormData();
-      
+
       // Append all text fields
       Object.entries(data).forEach(([key, value]) => {
-        if (value && typeof value === 'string') {
+        if (value && typeof value === "string") {
           formData.append(key, value);
         }
       });
 
       // Append files
       if (data.aadharCard && data.aadharCard.length > 0) {
-        formData.append('aadharCard', data.aadharCard[0]);
+        formData.append("aadharCard", data.aadharCard[0]);
       }
       if (data.gstCertificate && data.gstCertificate.length > 0) {
-        formData.append('gstCertificate', data.gstCertificate[0]);
+        formData.append("gstCertificate", data.gstCertificate[0]);
       }
       if (data.panCard && data.panCard.length > 0) {
-        formData.append('panCard', data.panCard[0]);
+        formData.append("panCard", data.panCard[0]);
       }
       if (data.storeImages && data.storeImages.length > 0) {
         Array.from(data.storeImages).forEach((file, index) => {
@@ -207,15 +208,14 @@ const AddStore = () => {
       }
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       console.log("Store data submitted:", data);
-      alert("Store created successfully!");
-      
+      // alert("Store created successfully!");
+
       // Reset form and navigate
-      reset();
-      navigate("/stores");
-      
+      // reset();
+      // navigate("/stores");
     } catch (error) {
       console.error("Error creating store:", error);
       alert("Error creating store. Please try again.");
@@ -242,7 +242,7 @@ const AddStore = () => {
         </div>
         <div className="col-md-6 pt-3">
           <span className="gap-10 d-flex align-items-center justify-content-md-end">
-            <button 
+            <button
               type="button"
               className="btn_imprt"
               onClick={handleCancel}
@@ -250,7 +250,7 @@ const AddStore = () => {
             >
               <X /> Cancel
             </button>
-            <button 
+            <button
               type="button"
               className="black_btn"
               onClick={handleSubmit(onSubmit)}
@@ -644,7 +644,7 @@ const AddStore = () => {
         <div className="row px-2 pt-3">
           <div className="col-12">
             <span className="gap-10 d-flex align-items-center justify-content-md-end">
-              <button 
+              <button
                 type="button"
                 className="btn_imprt"
                 onClick={handleCancel}
@@ -652,11 +652,7 @@ const AddStore = () => {
               >
                 <X /> Cancel
               </button>
-              <button 
-                type="submit"
-                className="black_btn"
-                disabled={loading}
-              >
+              <button type="submit" className="black_btn" disabled={loading}>
                 <Check /> {loading ? "Saving..." : "Save"}
               </button>
             </span>
