@@ -1,9 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import { Check, Edit, Eye, MoreVertical, Trash, X } from "react-feather";
+import { Check, Edit, MoreVertical, Trash, X } from "react-feather";
 
-const Actions = () => {
+const Actions = ({
+  deleteItem,
+  editItem,
+}: {
+  deleteItem: () => void;
+  editItem: () => void;
+}) => {
   const [showFilter, setShowFilter] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
+  const [isShowModal, setIsShowModal] = useState(false);
 
   const toggleFilter = () => {
     setShowFilter((prev) => !prev);
@@ -36,23 +43,23 @@ const Actions = () => {
           className="action_popup"
           style={{ display: showFilter ? "block" : "none" }}
         >
-          <button className="btn_crud">
+          <button className="btn_crud" onClick={editItem}>
             <Edit /> Edit
           </button>
-          <button className="btn_crud">
+          {/* <button className="btn_crud">
             <Eye /> View
-          </button>
+          </button> */}
           <button
             className="btn_crud text-red"
-            data-bs-toggle="modal"
-            data-bs-target="#exampleModal"
+            onClick={() => setIsShowModal(true)}
           >
             <Trash /> Delete
           </button>
         </div>
       </span>
       <div
-        className="modal fade"
+        className="modal fade show"
+        style={{ display: isShowModal ? "block" : "none" }}
         id="exampleModal"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
@@ -67,11 +74,20 @@ const Actions = () => {
               </div>
               <h3 className="mdl_head">Are you sure?</h3>
               <div className="d-flex justify-content-center gap-10">
-                <button className="btn_imprt">
+                <button
+                  className="btn_imprt"
+                  onClick={() => setIsShowModal(false)}
+                >
                   {" "}
                   <X></X> Cancel
                 </button>
-                <button className="black_btn">
+                <button
+                  className="black_btn"
+                  onClick={() => {
+                    deleteItem();
+                    setIsShowModal(false);
+                  }}
+                >
                   {" "}
                   <Check></Check> Yes
                 </button>

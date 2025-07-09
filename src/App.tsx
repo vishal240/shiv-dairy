@@ -90,7 +90,9 @@ function App() {
             <Route path="addproduct" element={<AddProduct />} />
             <Route path="orderdetails" element={<OrderDetails />} />
             <Route path="addcategories" element={<AddCategories />} />
+            <Route path="editcategory/:id" element={<AddCategories />} />
             <Route path="addbrands" element={<AddBrands />} />
+            <Route path="editbrands/:id" element={<AddBrands />} />
             <Route path="addcustomer" element={<AddCustomer />} />
             <Route path="addpurchase" element={<AddPurchase />} />
             <Route path="myprofile" element={<Myprofile />} />

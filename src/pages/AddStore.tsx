@@ -8,9 +8,13 @@ import { useState } from "react";
 import Input from "../components/inputs/Input";
 import Textarea from "../components/inputs/Textarea";
 import Select from "../components/inputs/Select";
-import FileInput from "../components/inputs/FileInput";
+// import FileInput from "../components/inputs/FileInput";
 import ImageUpload from "../components/inputs/ImageUpload";
 import type { StoreFormData } from "../types/store";
+import ApiService from "../services/api";
+import GooglePlacesAutocomplete from "../components/GooglePlacesAutocomplete";
+import { useLoadScript } from "@react-google-maps/api";
+import { GOOGLE_API_KEY } from "../config";
 
 // Validation schema
 const storeSchema = yup.object({
@@ -32,10 +36,20 @@ const storeSchema = yup.object({
     .required("Primary phone is required")
     .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
 
+  countryCode: yup
+    .string()
+    .required("Country code is required")
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
+
   primaryEmail: yup
     .string()
     .required("Primary email is required")
     .email("Please enter a valid email address"),
+
+  countryCodePrimary: yup
+    .string()
+    .required("Country code is required")
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
 
   secondaryPhone: yup
     .string()
@@ -77,50 +91,50 @@ const storeSchema = yup.object({
     .matches(/^[\d\-\s]{3,10}$/, "Please enter a valid ZIP code"),
 
   // Owner Information
-  ownerName: yup
-    .string()
-    .required("Owner name is required")
-    .min(2, "Owner name must be at least 2 characters")
-    .max(100, "Owner name must not exceed 100 characters"),
+  // ownerName: yup
+  //   .string()
+  //   .required("Owner name is required")
+  //   .min(2, "Owner name must be at least 2 characters")
+  //   .max(100, "Owner name must not exceed 100 characters"),
 
-  ownerEmail: yup
-    .string()
-    .required("Owner email is required")
-    .email("Please enter a valid email address"),
+  // ownerEmail: yup
+  //   .string()
+  //   .required("Owner email is required")
+  //   .email("Please enter a valid email address"),
 
-  ownerPhone: yup
-    .string()
-    .required("Owner phone is required")
-    .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
+  // ownerPhone: yup
+  //   .string()
+  //   .required("Owner phone is required")
+  //   .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
 
-  ownerAddress: yup
-    .string()
-    .required("Owner address is required")
-    .min(10, "Address must be at least 10 characters")
-    .max(200, "Address must not exceed 200 characters"),
+  // ownerAddress: yup
+  //   .string()
+  //   .required("Owner address is required")
+  //   .min(10, "Address must be at least 10 characters")
+  //   .max(200, "Address must not exceed 200 characters"),
 
-  ownerCity: yup
-    .string()
-    .required("Owner city is required")
-    .min(2, "City must be at least 2 characters")
-    .max(50, "City must not exceed 50 characters"),
+  // ownerCity: yup
+  //   .string()
+  //   .required("Owner city is required")
+  //   .min(2, "City must be at least 2 characters")
+  //   .max(50, "City must not exceed 50 characters"),
 
-  ownerState: yup
-    .string()
-    .required("Owner state is required")
-    .min(2, "State must be at least 2 characters")
-    .max(50, "State must not exceed 50 characters"),
+  // ownerState: yup
+  //   .string()
+  //   .required("Owner state is required")
+  //   .min(2, "State must be at least 2 characters")
+  //   .max(50, "State must not exceed 50 characters"),
 
-  ownerCountry: yup
-    .string()
-    .required("Owner country is required")
-    .min(2, "Country must be at least 2 characters")
-    .max(50, "Country must not exceed 50 characters"),
+  // ownerCountry: yup
+  //   .string()
+  //   .required("Owner country is required")
+  //   .min(2, "Country must be at least 2 characters")
+  //   .max(50, "Country must not exceed 50 characters"),
 
-  ownerZipCode: yup
-    .string()
-    .required("Owner ZIP code is required")
-    .matches(/^[\d\-\s]{3,10}$/, "Please enter a valid ZIP code"),
+  // ownerZipCode: yup
+  //   .string()
+  //   .required("Owner ZIP code is required")
+  //   .matches(/^[\d\-\s]{3,10}$/, "Please enter a valid ZIP code"),
 
   // Login Information
   userId: yup
@@ -147,8 +161,8 @@ const storeSchema = yup.object({
     .required("Please confirm your password")
     .oneOf([yup.ref("password")], "Passwords must match"),
 
-  // Status
-  status: yup.string().required("Status is required"),
+  storeImages: yup.mixed().required("Store image is required"),
+  bannerImages: yup.mixed().required("Banner image is required"),
 });
 
 const statusOptions = [
@@ -178,44 +192,83 @@ const AddStore = () => {
     try {
       // Create FormData for file uploads
       const formData = new FormData();
+      formData.append("store_name", data.storeName);
+      formData.append("description", data.storeDescription);
+      formData.append("country_code", data.countryCode);
+      formData.append("phone_primary", data.primaryPhone);
+      formData.append("email_primary", data.primaryEmail);
+      formData.append("phone_number", data.secondaryPhone || "");
+      formData.append("email", data.secondaryEmail || "");
+      formData.append(
+        "address",
+        JSON.stringify({
+          street_1: data.address,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+          zip: data.zipCode,
+        })
+      );
 
-      // Append all text fields
-      Object.entries(data).forEach(([key, value]) => {
-        if (value && typeof value === "string") {
-          formData.append(key, value);
-        }
-      });
+      formData.append("user_id", data.userId);
+      formData.append("password", data.password);
+      formData.append("confirm_password", data.confirmPassword);
 
-      // Append files
-      if (data.aadharCard && data.aadharCard.length > 0) {
-        formData.append("aadharCard", data.aadharCard[0]);
-      }
-      if (data.gstCertificate && data.gstCertificate.length > 0) {
-        formData.append("gstCertificate", data.gstCertificate[0]);
-      }
-      if (data.panCard && data.panCard.length > 0) {
-        formData.append("panCard", data.panCard[0]);
-      }
+      formData.append("country_code_primary", data.countryCodePrimary);
       if (data.storeImages && data.storeImages.length > 0) {
-        Array.from(data.storeImages).forEach((file, index) => {
-          formData.append(`storeImage_${index}`, file);
-        });
+        formData.append("store_image", data.storeImages[0]);
       }
       if (data.bannerImages && data.bannerImages.length > 0) {
-        Array.from(data.bannerImages).forEach((file, index) => {
-          formData.append(`bannerImage_${index}`, file);
-        });
+        formData.append("banner_image", data.bannerImages[0]);
       }
+      // Append all text fields
+      // Object.entries(data).forEach(([key, value]) => {
+      //   if (value && typeof value === "string") {
+      //     formData.append(key, value);
+      //   }
+      // });
+
+      // Append files
+      // if (data.aadharCard && data.aadharCard.length > 0) {
+      //   formData.append("aadharCard", data.aadharCard[0]);
+      // }
+      // if (data.gstCertificate && data.gstCertificate.length > 0) {
+      //   formData.append("gstCertificate", data.gstCertificate[0]);
+      // }
+      // if (data.panCard && data.panCard.length > 0) {
+      //   formData.append("panCard", data.panCard[0]);
+      // }
+      // if (data.storeImages && data.storeImages.length > 0) {
+      //   Array.from(data.storeImages).forEach((file, index) => {
+      //     formData.append(`storeImage_${index}`, file);
+      //   });
+      // }
+      // if (data.bannerImages && data.bannerImages.length > 0) {
+      //   Array.from(data.bannerImages).forEach((file, index) => {
+      //     formData.append(`bannerImage_${index}`, file);
+      //   });
+      // }
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      console.log("Store data submitted:", data);
+      // console.log("Store data submitted:", formData);
       // alert("Store created successfully!");
 
       // Reset form and navigate
       // reset();
       // navigate("/stores");
+      ApiService.post("/admin/createStore", formData)
+        .then((res: any) => {
+          alert(res.message);
+          navigate("/stores");
+        })
+        .catch((err: any) => {
+          alert(err.response.data.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       console.error("Error creating store:", error);
       alert("Error creating store. Please try again.");
@@ -228,7 +281,22 @@ const AddStore = () => {
     reset();
     navigate("/stores");
   };
-
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: GOOGLE_API_KEY,
+    libraries: ["places"],
+  });
+  const handleAddressSelect = (address: any) => {
+    console.log(address);
+    // setValue1(
+    //   "street_1",
+    //   address.plotNo ? address.plotNo + " " + address.street : address.street
+    // );
+    // setValue1("city", address.city);
+    // setValue1("state", address.state);
+    // setValue1("zip", address.postalCode);
+    // setValue1("country", address.country);
+  };
+  if (!isLoaded) return <p>Loading...</p>;
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
@@ -292,7 +360,18 @@ const AddStore = () => {
                     disabled={loading}
                   />
                 </div>
-                <div className="col-md-6 pt-3">
+                <div className="col-md-2 pt-3">
+                  <Input
+                    control={control}
+                    name="countryCodePrimary"
+                    label="Country Code (Primary)"
+                    type="tel"
+                    placeholder="Enter primary phone number"
+                    error={errors.countryCodePrimary?.message}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="col-md-4 pt-3">
                   <Input
                     control={control}
                     name="primaryPhone"
@@ -314,7 +393,18 @@ const AddStore = () => {
                     disabled={loading}
                   />
                 </div>
-                <div className="col-md-6 pt-3">
+                <div className="col-md-2 pt-3">
+                  <Input
+                    control={control}
+                    name="countryCode"
+                    label="Country Code"
+                    type="tel"
+                    placeholder="Enter primary phone number"
+                    error={errors.countryCode?.message}
+                    disabled={loading}
+                  />
+                </div>
+                <div className="col-md-4 pt-3">
                   <Input
                     control={control}
                     name="secondaryPhone"
@@ -337,7 +427,14 @@ const AddStore = () => {
                   />
                 </div>
                 <div className="col-md-12 pt-3">
-                  <Input
+                  <GooglePlacesAutocomplete
+                    control={control}
+                    name="address"
+                    onSelect={handleAddressSelect}
+                    label="Address"
+                    error={errors.address?.message}
+                  />
+                  {/* <Input
                     control={control}
                     name="address"
                     label="Address"
@@ -345,7 +442,7 @@ const AddStore = () => {
                     placeholder="Enter complete address"
                     error={errors.address?.message}
                     disabled={loading}
-                  />
+                  /> */}
                 </div>
                 <div className="col-md-6 pt-3">
                   <Input
@@ -397,7 +494,7 @@ const AddStore = () => {
         </div>
 
         {/* Documents */}
-        <div className="row px-2 pt-3">
+        {/* <div className="row px-2 pt-3">
           <div className="col-12">
             <div className="card_cmn">
               <div className="row">
@@ -437,10 +534,10 @@ const AddStore = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Owner Information */}
-        <div className="row px-2 pt-3">
+        {/* <div className="row px-2 pt-3">
           <div className="col-12">
             <div className="card_cmn">
               <div className="row">
@@ -538,7 +635,7 @@ const AddStore = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Login Information */}
         <div className="row px-2 pt-3">
@@ -610,29 +707,6 @@ const AddStore = () => {
                     label="Banner Image (Optional)"
                     error={errors.bannerImages?.message}
                     multiple
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="row px-2 pt-3">
-          <div className="col-12">
-            <div className="card_cmn">
-              <div className="row">
-                <h5 className="card_heading">Status</h5>
-              </div>
-              <div className="row">
-                <div className="col-md-4 pt-3">
-                  <Select
-                    control={control}
-                    name="status"
-                    label="Status"
-                    options={statusOptions}
-                    error={errors.status?.message}
-                    disabled={loading}
                   />
                 </div>
               </div>

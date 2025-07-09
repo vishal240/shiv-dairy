@@ -4,15 +4,38 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { CategoryFormData } from "../types/categories";
 import Input from "../components/inputs/Input";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ApiService from "../services/api";
 
 const AddCategories = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-
+  const { id } = useParams();
+  const [subCatId, setsubCatId] = useState("");
+  const getCategoryById = (id: string) => {
+    ApiService.post("/admin/getCategoryDetails", {
+      category_id: id,
+    })
+      .then((res: any) => {
+        setValue("product_category_name", res.data.product_category_name);
+        setValue(
+          "product_sub_category_name",
+          res.data.subcategories[0].product_category_name
+        );
+        setsubCatId(res.data.subcategories[0]._id);
+      })
+      .catch((err: any) => {
+        alert(err.response.data.message);
+      });
+  };
+  useEffect(() => {
+    if (id) {
+      getCategoryById(id);
+    }
+  }, [id]);
   const storeSchema = yup.object({
+    category_id: yup.string().optional(),
     product_category_name: yup.string().required("Category name is required"),
     product_sub_category_name: yup
       .string()
@@ -20,35 +43,58 @@ const AddCategories = () => {
   });
 
   const {
-    register,
     handleSubmit,
     formState: { errors },
     control,
     reset,
+    setValue,
   } = useForm<CategoryFormData>({
-    resolver: yupResolver(storeSchema),
+    resolver: yupResolver(storeSchema as any),
   });
 
   const onSubmit = (data: CategoryFormData) => {
     setLoading(true);
-    ApiService.post("/admin/createCategory", {
-      product_category_name: data.product_category_name,
-      children: [
-        {
-          product_category_name: data.product_sub_category_name,
-        },
-      ],
-    })
-      .then((res: any) => {
-        alert(res.message);
-        navigate("/categories");
+    if (id) {
+      ApiService.post("/admin/editCategory", {
+        category_id: id,
+        product_category_name: data.product_category_name,
+        children: [
+          {
+            product_category_name: data.product_sub_category_name,
+            category_id: subCatId,
+          },
+        ],
       })
-      .catch((err: any) => {
-        alert(err.response.data.message);
+        .then((res: any) => {
+          alert(res.message);
+          navigate("/categories");
+        })
+        .catch((err: any) => {
+          alert(err.response.data.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      ApiService.post("/admin/createCategory", {
+        product_category_name: data.product_category_name,
+        children: [
+          {
+            product_category_name: data.product_sub_category_name,
+          },
+        ],
       })
-      .finally(() => {
-        setLoading(false);
-      });
+        .then((res: any) => {
+          alert(res.message);
+          navigate("/categories");
+        })
+        .catch((err: any) => {
+          alert(err.response.data.message);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
   };
 
   const handleCancel = () => {
@@ -60,11 +106,15 @@ const AddCategories = () => {
     <div className="container-fluid">
       <div className="row px-2 pt-3">
         <div className="col-md-6 pt-4 pt-md-0">
-          <h1 className="page_heading mb-0">Add Category</h1>
+          <h1 className="page_heading mb-0">
+            {id ? "Edit Category" : "Add Category"}
+          </h1>
           <div className="breadcrumbs">
             <span>Dashboard / </span>
             <span>Category List / </span>
-            <span className="active">Add Category</span>
+            <span className="active">
+              {id ? "Edit Category" : "Add Category"}
+            </span>
           </div>
         </div>
         <div className="col-md-6 pt-3">

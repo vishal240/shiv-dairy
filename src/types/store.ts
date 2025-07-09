@@ -2,6 +2,8 @@ export interface StoreFormData {
   // General Business Information
   storeName: string;
   storeDescription: string;
+  countryCode: string;
+  countryCodePrimary: string;
   primaryPhone: string;
   primaryEmail: string;
   secondaryPhone?: string;
@@ -13,19 +15,19 @@ export interface StoreFormData {
   zipCode: string;
 
   // Documents
-  aadharCard?: FileList;
-  gstCertificate?: FileList;
-  panCard?: FileList;
+  // aadharCard?: FileList;
+  // gstCertificate?: FileList;
+  // panCard?: FileList;
 
   // Owner Information
-  ownerName: string;
-  ownerEmail: string;
-  ownerPhone: string;
-  ownerAddress: string;
-  ownerCity: string;
-  ownerState: string;
-  ownerCountry: string;
-  ownerZipCode: string;
+  // ownerName: string;
+  // ownerEmail: string;
+  // ownerPhone: string;
+  // ownerAddress: string;
+  // ownerCity: string;
+  // ownerState: string;
+  // ownerCountry: string;
+  // ownerZipCode: string;
 
   // Login Information
   userId: string;

@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
     "start": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -12,9 +11,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@react-google-maps/api": "^2.20.7",
     "axios": "^1.10.0",
     "bootstrap": "^5.3.7",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "react": "^19.1.0",
     "react-date-range": "^2.0.1",
     "react-datepicker": "^8.4.0",
