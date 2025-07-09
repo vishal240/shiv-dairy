@@ -63,31 +63,25 @@ const profileSchema = yup.object({
     .max(50, "Country must not exceed 50 characters"),
 
   // Change Password (optional fields)
-  old_password: yup
-    .string()
-    .when(["new_password", "confirm_password"], {
-      is: (new_password: string, confirm_password: string) => 
-        new_password || confirm_password,
-      then: (schema) => schema.required("Old password is required to change password"),
-      otherwise: (schema) => schema.optional(),
-    }),
   new_password: yup
     .string()
-    .when("old_password", {
-      is: (old_password: string) => old_password,
-      then: (schema) => schema
-        .required("New password is required")
-        .min(8, "Password must be at least 8 characters")
-        .matches(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
-          "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-        ),
+    .optional()
+    .test('password-strength', 'Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character', function(value) {
+      if (!value) return true; // Optional field
+      return value.length >= 8 && 
+             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value);
+    }),
+  old_password: yup
+    .string()
+    .when("new_password", {
+      is: (new_password: string) => new_password && new_password.length > 0,
+      then: (schema) => schema.required("Old password is required to change password"),
       otherwise: (schema) => schema.optional(),
     }),
   confirm_password: yup
     .string()
     .when("new_password", {
-      is: (new_password: string) => new_password,
+      is: (new_password: string) => new_password && new_password.length > 0,
       then: (schema) => schema
         .required("Please confirm your new password")
         .oneOf([yup.ref("new_password")], "Passwords must match"),
