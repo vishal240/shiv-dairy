@@ -88,6 +88,7 @@ function App() {
             <Route path="selectstore" element={<SelectStore />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="addproduct" element={<AddProduct />} />
+            <Route path="editproduct/:id" element={<AddProduct />} />
             <Route path="orderdetails" element={<OrderDetails />} />
             <Route path="addcategories" element={<AddCategories />} />
             <Route path="editcategory/:id" element={<AddCategories />} />
