@@ -38,7 +38,7 @@ const Stores = () => {
     })
       .then((res: any) => {
         console.log(res);
-        setStores(res.data);
+        setStores(res.data.list);
       })
       .catch((err: any) => {
         console.error("Error fetching stores:", err);

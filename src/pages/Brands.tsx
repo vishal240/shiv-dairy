@@ -122,7 +122,7 @@ const Brands = () => {
     ApiService.post("/admin/listBrands", {})
       .then((res: any) => {
         console.log(res);
-        setBrands(res.data);
+        setBrands(res.data.list);
       })
       .finally(() => {
         setLoading(false);

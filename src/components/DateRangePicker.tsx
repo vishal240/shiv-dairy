@@ -17,6 +17,10 @@ const DateRangePicker: React.FC = () => {
     key: "selection",
   });
 
+  useEffect(() => {
+    console.log(selectionRange);
+  }, [selectionRange]);
+
   const [hasSelected, setHasSelected] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);

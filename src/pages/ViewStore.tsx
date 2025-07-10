@@ -67,7 +67,11 @@ const ViewStore = () => {
                   </span>
                   <div>
                     <p className="font-12 color-grey mb-0">Address</p>
-                    <p className="font-12">{store.address}</p>
+                    <p className="font-12">
+                      {store.address?.street_1}, {store.address?.city},{" "}
+                      {store.address?.state}, {store.address?.zip},{" "}
+                      {store.address?.country}
+                    </p>
                   </div>
                 </div>
               </div>

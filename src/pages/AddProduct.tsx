@@ -54,7 +54,6 @@ const productSchema = yup.object({
     .required("Discount percentage is required")
     .min(0, "Discount cannot be negative")
     .max(100, "Discount cannot exceed 100%"),
-  b2b_tax_class: yup.string().required("Tax class is required"),
   b2b_amount: yup
     .number()
     .required("B2B amount is required")
@@ -77,7 +76,6 @@ const productSchema = yup.object({
     .required("Discount percentage is required")
     .min(0, "Discount cannot be negative")
     .max(100, "Discount cannot exceed 100%"),
-  b2c_tax_class: yup.string().required("Tax class is required"),
   b2c_amount: yup
     .number()
     .required("B2C amount is required")
@@ -121,14 +119,60 @@ const AddProduct = () => {
     resolver: yupResolver(productSchema) as any,
     defaultValues: {
       status: "active",
+      b2b_min_batch_qty: 1,
       b2b_discount_type: "percentage",
       b2c_discount_type: "percentage",
       b2b_discount_percentage: 0,
       b2c_discount_percentage: 0,
+      b2b_batch_qty: 1,
     },
   });
 
   const selectedCategoryId = watch("category_id");
+
+  useEffect(() => {
+    if (watch("b2b_discount_type") === "percentage") {
+      const finalPrice =
+        Number(watch("b2b_unit_price")) * Number(watch("b2b_batch_qty")) -
+        (Number(watch("b2b_unit_price")) *
+          Number(watch("b2b_batch_qty")) *
+          Number(watch("b2b_discount_percentage"))) /
+          100;
+      setValue("b2b_amount", finalPrice);
+    } else {
+      const finalPrice =
+        Number(watch("b2b_unit_price")) * Number(watch("b2b_batch_qty")) -
+        Number(watch("b2b_discount_percentage"));
+      setValue("b2b_amount", finalPrice);
+    }
+  }, [
+    watch("b2b_unit_price"),
+    watch("b2b_batch_qty"),
+    watch("b2b_discount_percentage"),
+    watch("b2b_discount_type"),
+  ]);
+
+  useEffect(() => {
+    if (watch("b2c_discount_type") === "percentage") {
+      const finalPrice =
+        Number(watch("b2c_unit_price")) * Number(watch("b2c_qty")) -
+        (Number(watch("b2c_unit_price")) *
+          Number(watch("b2c_qty")) *
+          Number(watch("b2c_discount_percentage"))) /
+          100;
+      setValue("b2c_amount", finalPrice);
+    } else {
+      const finalPrice =
+        Number(watch("b2c_unit_price")) * Number(watch("b2c_qty")) -
+        Number(watch("b2c_discount_percentage"));
+      setValue("b2c_amount", finalPrice);
+    }
+  }, [
+    watch("b2c_unit_price"),
+    watch("b2c_qty"),
+    watch("b2c_discount_percentage"),
+    watch("b2c_discount_type"),
+  ]);
 
   // Load initial data
   useEffect(() => {
@@ -143,94 +187,124 @@ const AddProduct = () => {
   // Update subcategories when category changes
   useEffect(() => {
     if (selectedCategoryId) {
-      const selectedCategory = categories.find(cat => cat._id === selectedCategoryId);
-      setSubCategories(selectedCategory?.subcategories || []);
+      ApiService.post("/admin/getSubCategories", {
+        parent_category_id: selectedCategoryId,
+      })
+        .then((response: any) => {
+          setSubCategories(response.data || []);
+        })
+        .catch((error: any) => {
+          console.error("Error loading subcategories:", error);
+        });
       setValue("sub_category_id", ""); // Reset subcategory selection
     }
-  }, [selectedCategoryId, categories, setValue]);
+  }, [selectedCategoryId, setValue]);
 
-  const loadStores = async () => {
-    try {
-      const response = await ApiService.post("/admin/listStores", {});
-      setStores(response.data || []);
-    } catch (error) {
-      console.error("Error loading stores:", error);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const response = await ApiService.post("/admin/getCategoryList", {});
-      setCategories(response.data || []);
-    } catch (error) {
-      console.error("Error loading categories:", error);
-    }
-  };
-
-  const loadBrands = async () => {
-    try {
-      const response = await ApiService.post("/admin/listBrands", {});
-      setBrands(response.data || []);
-    } catch (error) {
-      console.error("Error loading brands:", error);
-    }
-  };
-
-  const loadProduct = async (productId: string) => {
-    try {
-      const response = await ApiService.post("/admin/getProductDetails", {
-        product_id: productId,
+  const loadStores = () => {
+    ApiService.post("/admin/listStores", {})
+      .then((response: any) => {
+        setStores(response.data.list || []);
+      })
+      .catch((error: any) => {
+        console.error("Error loading stores:", error);
       });
-      const product = response.data;
-      
-      // Populate form with product data
-      Object.keys(product).forEach((key) => {
-        if (key in product) {
-          setValue(key as keyof ProductFormData, product[key]);
-        }
-      });
-    } catch (error) {
-      console.error("Error loading product:", error);
-      alert("Error loading product details");
-    }
   };
 
-  const onSubmit = async (data: ProductFormData) => {
+  const loadCategories = () => {
+    ApiService.post("/admin/getCategoryList", {})
+      .then((response: any) => {
+        setCategories(response.data || []);
+      })
+      .catch((error: any) => {
+        console.error("Error loading categories:", error);
+      });
+  };
+
+  const loadBrands = () => {
+    ApiService.post("/admin/listBrands", {})
+      .then((response: any) => {
+        setBrands(response.data.list || []);
+      })
+      .catch((error: any) => {
+        console.error("Error loading brands:", error);
+      });
+  };
+
+  const loadProduct = (productId: string) => {
+    ApiService.post("/admin/getProductDetails", {
+      product_id: productId,
+    })
+      .then((response: any) => {
+        const product = response.data;
+        console.log(product);
+        // Populate form with product data
+        Object.keys(product).forEach((key) => {
+          if (key in product) {
+            setValue(key as keyof ProductFormData, product[key]);
+          }
+        });
+      })
+      .catch((error: any) => {
+        console.error("Error loading product:", error);
+      });
+  };
+
+  const onSubmit = (data: ProductFormData) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      
-      // Append all form fields
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && key !== 'product_images' && key !== 'product_videos') {
-          formData.append(key, value.toString());
-        }
-      });
-
-      // Append files
+      formData.append("product_name", data.product_name);
+      formData.append("store_id", data.store_id);
+      formData.append("category_id", data.category_id);
+      formData.append("subcategory_id", data.sub_category_id);
+      formData.append("brand_id", data.brand_id);
+      formData.append(
+        "pricing_b2b",
+        JSON.stringify({
+          batch: data.b2b_batch_qty,
+          batch_quantity: data.b2b_min_batch_qty,
+          discount_type: data.b2b_discount_type,
+          discount_percentage: data.b2b_discount_percentage,
+          price: data.b2b_unit_price,
+          final_price: data.b2b_amount,
+        })
+      );
+      formData.append(
+        "pricing_b2c",
+        JSON.stringify({
+          quantity: data.b2c_qty,
+          discount_type: data.b2c_discount_type,
+          discount_percentage: data.b2c_discount_percentage,
+          price: data.b2c_unit_price,
+          final_price: data.b2c_amount,
+        })
+      );
       if (data.product_images && data.product_images.length > 0) {
-        Array.from(data.product_images).forEach((file, index) => {
-          formData.append(`product_image_${index}`, file);
-        });
+        for (let i = 0; i < data.product_images.length; i++) {
+          formData.append("product_images", data.product_images[i]);
+        }
       }
-
       if (data.product_videos && data.product_videos.length > 0) {
-        Array.from(data.product_videos).forEach((file, index) => {
-          formData.append(`product_video_${index}`, file);
-        });
+        for (let i = 0; i < data.product_videos.length; i++) {
+          formData.append("product_images", data.product_videos[i]);
+        }
       }
+      formData.append("status", data.status);
 
-      const endpoint = id ? "/admin/editProduct" : "/admin/createProduct";
+      const endpoint = id ? "/admin/editProduct" : "/admin/addProduct";
       if (id) {
         formData.append("product_id", id);
       }
 
-      const response = await ApiService.post(endpoint, formData);
-      alert(response.message || "Product saved successfully!");
-      navigate("/products");
-    } catch (error: any) {
-      console.error("Error saving product:", error);
-      alert(error.response?.data?.message || "Error saving product");
+      ApiService.post(endpoint, formData)
+        .then((response: any) => {
+          alert(response.message || "Product saved successfully!");
+          navigate("/products");
+        })
+        .catch((error: any) => {
+          console.error("Error saving product:", error);
+          alert(error.response?.data?.message || "Error saving product");
+        });
     } finally {
       setLoading(false);
     }
@@ -241,24 +315,24 @@ const AddProduct = () => {
     navigate("/products");
   };
 
-  const storeOptions = stores.map(store => ({
+  const storeOptions = stores.map((store) => ({
     value: store._id,
-    label: store.store_name
+    label: store.store_name,
   }));
 
-  const categoryOptions = categories.map(category => ({
+  const categoryOptions = categories.map((category) => ({
     value: category._id,
-    label: category.product_category_name
+    label: category.product_category_name,
   }));
 
-  const subCategoryOptions = subCategories.map(subCategory => ({
+  const subCategoryOptions = subCategories.map((subCategory) => ({
     value: subCategory._id,
-    label: subCategory.product_category_name
+    label: subCategory.product_category_name,
   }));
 
-  const brandOptions = brands.map(brand => ({
+  const brandOptions = brands.map((brand) => ({
     value: brand._id,
-    label: brand.brand_name
+    label: brand.brand_name,
   }));
 
   return (
@@ -271,7 +345,9 @@ const AddProduct = () => {
           <div className="breadcrumbs">
             <span>Dashboard / </span>
             <span>Product List / </span>
-            <span className="active">{id ? "Edit Product" : "Add Product"}</span>
+            <span className="active">
+              {id ? "Edit Product" : "Add Product"}
+            </span>
           </div>
         </div>
         <div className="col-md-6 pt-3">
@@ -367,11 +443,11 @@ const AddProduct = () => {
                       <Input
                         control={control}
                         name="b2b_min_batch_qty"
-                        label="Min Batch Qty"
+                        label="Batch"
                         type="number"
-                        placeholder="Enter minimum batch quantity"
+                        placeholder="Enter batch"
                         error={errors.b2b_min_batch_qty?.message}
-                        disabled={loading}
+                        disabled={true}
                       />
                     </div>
                     <div className="col-12 pt-3">
@@ -399,35 +475,25 @@ const AddProduct = () => {
                       <Input
                         control={control}
                         name="b2b_discount_percentage"
-                        label="Discount Percentage"
+                        label="Discount"
                         type="number"
                         step="0.01"
-                        placeholder="Enter discount percentage"
+                        placeholder="Enter discount"
                         error={errors.b2b_discount_percentage?.message}
                         disabled={loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
-                      <Input
-                        control={control}
-                        name="b2b_tax_class"
-                        label="Tax Class"
-                        type="text"
-                        placeholder="Enter tax class"
-                        error={errors.b2b_tax_class?.message}
-                        disabled={loading}
-                      />
-                    </div>
+
                     <div className="col-md-6 pt-3">
                       <Input
                         control={control}
                         name="b2b_amount"
-                        label="Amount"
+                        label="Final Amount"
                         type="number"
                         step="0.01"
                         placeholder="Enter amount"
                         error={errors.b2b_amount?.message}
-                        disabled={loading}
+                        readOnly={true}
                       />
                     </div>
                   </div>
@@ -480,35 +546,25 @@ const AddProduct = () => {
                       <Input
                         control={control}
                         name="b2c_discount_percentage"
-                        label="Discount Percentage"
+                        label="Discount"
                         type="number"
                         step="0.01"
-                        placeholder="Enter discount percentage"
+                        placeholder="Enter discount"
                         error={errors.b2c_discount_percentage?.message}
                         disabled={loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
-                      <Input
-                        control={control}
-                        name="b2c_tax_class"
-                        label="Tax Class"
-                        type="text"
-                        placeholder="Enter tax class"
-                        error={errors.b2c_tax_class?.message}
-                        disabled={loading}
-                      />
-                    </div>
+
                     <div className="col-md-6 pt-3">
                       <Input
                         control={control}
                         name="b2c_amount"
-                        label="Amount"
+                        label="Final Amount"
                         type="number"
                         step="0.01"
                         placeholder="Enter amount"
                         error={errors.b2c_amount?.message}
-                        disabled={loading}
+                        readOnly={true}
                       />
                     </div>
                   </div>
@@ -559,7 +615,11 @@ const AddProduct = () => {
                   >
                     <X /> Cancel
                   </button>
-                  <button type="submit" className="black_btn" disabled={loading}>
+                  <button
+                    type="submit"
+                    className="black_btn"
+                    disabled={loading}
+                  >
                     <Check /> {loading ? "Saving..." : "Save"}
                   </button>
                 </span>
