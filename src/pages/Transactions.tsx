@@ -111,9 +111,9 @@ const Transactions = () => {
                 <p className="card_subheading">All Transactions</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
-                <DateRangePicker></DateRangePicker>
+                <DateRangePicker onDateChange={() => {}}></DateRangePicker>
                 <button className="common-button text-red">
                   <Trash></Trash>
                   Delete
@@ -180,129 +180,7 @@ const Transactions = () => {
                   <td>
                     <span className="status low">Processing</span>
                   </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>#302012</td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <img src={shop} className="product-img"></img>
-                      <div className="px-2">
-                        <p className="products_name">Shiv Dairy</p>
-                        <span className="sku">YN, Road, Indore</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
-
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>₹121.00</td>
-                  <td>B2B</td>
-                  <td>
-                    <span className="status low">Processing</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>#302012</td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <img src={shop} className="product-img"></img>
-                      <div className="px-2">
-                        <p className="products_name">Shiv Dairy</p>
-                        <span className="sku">YN, Road, Indore</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
-
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>₹121.00</td>
-                  <td>B2B</td>
-                  <td>
-                    <span className="status low">Processing</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>#302012</td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <img src={shop} className="product-img"></img>
-                      <div className="px-2">
-                        <p className="products_name">Shiv Dairy</p>
-                        <span className="sku">YN, Road, Indore</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>24/10/2025</td>
-
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>₹121.00</td>
-                  <td>B2B</td>
-                  <td>
-                    <span className="status low">Processing</span>
-                  </td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
+                  <td>{/* <Actions></Actions> */}</td>
                 </tr>
               </tbody>
             </table>

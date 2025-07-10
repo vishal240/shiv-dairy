@@ -43,6 +43,7 @@ import AddPurchase from "./pages/AddPurchase";
 import Myprofile from "./pages/Myprofile";
 import CustomerDetails from "./pages/CustomerDetails";
 import Invoice from "./pages/Invoice";
+import CategoriesWithApi from "./pages/CategoriesWithApi";
 
 function App() {
   return (
@@ -76,7 +77,7 @@ function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="stores" element={<Stores />} />
             <Route path="products" element={<Products />} />
-            <Route path="categories" element={<Categories />} />
+            <Route path="categories" element={<CategoriesWithApi />} />
             <Route path="brands" element={<Brands />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="customers" element={<Customers />} />

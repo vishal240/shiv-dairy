@@ -83,9 +83,9 @@ const Purchase = () => {
                 <p className="card_subheading">All Purchase</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
-                <DateRangePicker></DateRangePicker>
+                <DateRangePicker onDateChange={() => {}}></DateRangePicker>
                 <button className="common-button text-red">
                   <Trash></Trash>
                   Delete
@@ -149,79 +149,7 @@ const Purchase = () => {
                     <span className="status low">Low Stock</span>
                   </td>
 
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <img src={milk} className="product-img"></img>
-                      <div className="px-2">
-                        <p className="products_name">Butter Milk</p>
-                        <span className="sku">Shiv Dairy</span>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>340872</td>
-
-                  <td>Dairy Product</td>
-                  <td>10</td>
-                  <td>₹25</td>
-                  <td>25/10/2025</td>
-                  <td>
-                    <span className="status low">Low Stock</span>
-                  </td>
-
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <img src={milk} className="product-img"></img>
-                      <div className="px-2">
-                        <p className="products_name">Butter Milk</p>
-                        <span className="sku">Shiv Dairy</span>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>340872</td>
-
-                  <td>Dairy Product</td>
-                  <td>10</td>
-                  <td>₹25</td>
-                  <td>25/10/2025</td>
-                  <td>
-                    <span className="status low">Low Stock</span>
-                  </td>
-
-                  <td>
-                    <Actions></Actions>
-                  </td>
+                  <td>{/* <Actions></Actions> */}</td>
                 </tr>
               </tbody>
             </table>

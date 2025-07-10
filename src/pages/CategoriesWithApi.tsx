@@ -19,10 +19,20 @@ const CategoriesWithApi = () => {
   const navigate = useNavigate();
 
   // API call function
-  const fetchCategories = async (page: number, limit: number) => {
+  const fetchCategories = async (
+    page: number,
+    limit: number,
+    search: string,
+    startDate: string,
+    endDate: string
+  ) => {
     return await ApiService.post("/admin/getCategoryList", {
-      page: page.toString(),
-      limit: limit.toString(),
+      filters: { search: search, startdate: startDate, enddate: endDate },
+      sorters: {},
+      pagination: {
+        page: page.toString(),
+        pageSize: limit.toString(),
+      },
     });
   };
 
@@ -36,20 +46,24 @@ const CategoriesWithApi = () => {
     loading,
     error,
     goToPage,
-    refresh
+    goToSearch,
+    goToDateSearch,
+    refresh,
   } = useApiPagination({
     apiCall: fetchCategories,
     itemsPerPage: 10,
-    initialPage: 1
+    initialPage: 1,
   });
 
   // Transform categories data for table
-  const tableData: TableRow[] = categories.map((category: any, index: number) => ({
-    id: category._id || index,
-    name: category.product_category_name,
-    dateAdded: dayjs(category.created_on).format("DD/MM/YYYY | HH:mm A"),
-    status: category.is_deleted ? "Inactive" : "Active",
-  }));
+  const tableData: TableRow[] = categories.map(
+    (category: any, index: number) => ({
+      id: category._id || index,
+      name: category.product_category_name,
+      dateAdded: dayjs(category.created_on).format("DD/MM/YYYY | HH:mm A"),
+      status: category.is_deleted ? "Inactive" : "Active",
+    })
+  );
 
   // Selection hook
   const { selectedRows, selectRow, toggleSelectAll, getSelectedCount } =
@@ -145,12 +159,20 @@ const CategoriesWithApi = () => {
   const handlePageChange = (page: number) => {
     goToPage(page);
   };
-
+  const handleSearch = (value: string) => {
+    goToSearch(value);
+  };
+  const handleDateChange = (startDate: any, endDate: any) => {
+    goToDateSearch(
+      dayjs(startDate).format("YYYY-MM-DD"),
+      dayjs(endDate).format("YYYY-MM-DD")
+    );
+  };
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
         <div className="col-md-6 pt-4 pt-md-0">
-          <h1 className="page_heading mb-0">Categories (API Pagination)</h1>
+          <h1 className="page_heading mb-0">Categories</h1>
           <div className="breadcrumbs">
             <span>Dashboard / </span>
             <span className="active">Categories</span>
@@ -173,16 +195,19 @@ const CategoriesWithApi = () => {
                 <p className="card_subheading">Categories List</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search />
-                <Filters />
-                <DateRangePicker />
+                <Search onSearch={handleSearch} />
+                {/* <Filters /> */}
+                <DateRangePicker onDateChange={handleDateChange} />
                 <button
                   onClick={deleteCategories}
                   className="common-button text-red"
                   disabled={getSelectedCount() === 0 || loading}
                   style={{
-                    opacity: (getSelectedCount() === 0 || loading) ? 0.5 : 1,
-                    cursor: (getSelectedCount() === 0 || loading) ? "not-allowed" : "pointer",
+                    opacity: getSelectedCount() === 0 || loading ? 0.5 : 1,
+                    cursor:
+                      getSelectedCount() === 0 || loading
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 >
                   <Trash />
@@ -199,7 +224,14 @@ const CategoriesWithApi = () => {
             </div>
 
             {error && (
-              <div className="alert alert-danger" style={{ fontSize: '12px', padding: '8px', marginBottom: '15px' }}>
+              <div
+                className="alert alert-danger"
+                style={{
+                  fontSize: "12px",
+                  padding: "8px",
+                  marginBottom: "15px",
+                }}
+              >
                 {error}
               </div>
             )}

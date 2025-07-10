@@ -31,7 +31,7 @@ const Dashboard = () => {
                 <option>Please Select Store</option>
               </select>
             </div>
-            <DateRangePicker></DateRangePicker>
+            <DateRangePicker onDateChange={() => {}}></DateRangePicker>
           </div>
         </div>
       </div>
@@ -105,12 +105,10 @@ const Dashboard = () => {
             <div className="d-md-flex pb-3 pb-md-0 justify-content-between">
               <div>
                 <h1 className="card_heading">Top Selling Products</h1>
-                <p className="card_subheading">
-                  Checkout top selling products
-                </p>
+                <p className="card_subheading">Checkout top selling products</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
               </div>
             </div>
@@ -201,9 +199,7 @@ const Dashboard = () => {
             <div className="d-flex justify-content-between">
               <div>
                 <h1 className="card_heading">Sales by Stores</h1>
-                <p className="card_subheading">
-                  Sales performance by Stores
-                </p>
+                <p className="card_subheading">Sales performance by Stores</p>
               </div>
             </div>
 
@@ -267,7 +263,7 @@ const Dashboard = () => {
                 <p className="card_subheading">Check Inventory</p>
               </div>
               <div className="d-flex gap-10 align-items-center">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
               </div>
             </div>
@@ -373,7 +369,7 @@ const Dashboard = () => {
                 <p className="card_subheading">Recent Orders</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
                 <button className="common-button text-red">
                   <Trash></Trash>

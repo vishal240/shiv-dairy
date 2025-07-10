@@ -9,42 +9,70 @@ import { useEffect, useState } from "react";
 import ApiService from "../services/api";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import Pagination from "../components/Pagination/Pagination";
-import { usePagination } from "../hooks/usePagination";
-
+import ApiPagination from "../components/Pagination/ApiPagination";
+import { useApiPagination } from "../hooks/useApiPagination";
+import { subDays } from "date-fns";
+import type { RangeKeyDict } from "react-date-range";
 const Stores = () => {
-  const [stores, setStores] = useState<any>([]);
   const navigate = useNavigate();
-  useEffect(() => {
-    fetchStores();
-  }, []);
-  // Pagination hook
+  const [selectionRange, setSelectionRange] = useState({
+    startDate: subDays(new Date(), 29),
+    endDate: new Date(),
+    key: "selection",
+  });
+  const [hasSelected, setHasSelected] = useState(false);
+  // API call function
+  const fetchStores = async (
+    page: number,
+    limit: number,
+    search: string,
+    startdate: string,
+    enddate: string
+  ) => {
+    return await ApiService.post("/admin/listStores", {
+      filters: {
+        search: search,
+        startdate: startdate,
+        enddate: enddate,
+      },
+      sorters: {},
+      pagination: {
+        page: page.toString(),
+        pageSize: limit.toString(),
+      },
+    });
+  };
+  // Use API pagination hook
   const {
+    data: stores,
     currentPage,
     totalPages,
     totalItems,
     itemsPerPage,
-    paginatedData,
+    loading,
+    error,
     goToPage,
-  } = usePagination({
-    data: stores,
+    refresh,
+    goToSearch,
+    goToDateSearch,
+  } = useApiPagination({
+    apiCall: fetchStores,
     itemsPerPage: 10,
+    initialPage: 1,
   });
-  const fetchStores = () => {
-    ApiService.post("/admin/listStores", {
-      page: "1",
-      limit: "100",
-      search: "",
-    })
-      .then((res: any) => {
-        console.log(res);
-        setStores(res.data.list);
-      })
-      .catch((err: any) => {
-        console.error("Error fetching stores:", err);
-      });
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    goToPage(page);
   };
-
+  const handleSearch = (value: string) => {
+    goToSearch(value);
+  };
+  const handleDateChange = (startDate: any, endDate: any) => {
+    goToDateSearch(
+      dayjs(startDate).format("YYYY-MM-DD"),
+      dayjs(endDate).format("YYYY-MM-DD")
+    );
+  };
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
@@ -72,30 +100,45 @@ const Stores = () => {
                 <p className="card_subheading">Our Stores</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search />
-                <Filters />
-                <DateRangePicker />
+                <Search onSearch={handleSearch} />
+                {/* <Filters /> */}
+                <DateRangePicker onDateChange={handleDateChange} />
+                <button
+                  onClick={refresh}
+                  className="common-button"
+                  disabled={loading}
+                >
+                  Refresh
+                </button>
               </div>
             </div>
-
+            {error && (
+              <div
+                className="alert alert-danger"
+                style={{
+                  fontSize: "12px",
+                  padding: "8px",
+                  marginBottom: "15px",
+                }}
+              >
+                {error}
+              </div>
+            )}
             <div className="row">
-              {paginatedData.length === 0 ? (
+              {stores.length === 0 ? (
                 <div className="col-12">
                   <p>No stores found</p>
                 </div>
               ) : (
-                paginatedData.map((store: any, index: number) => (
+                stores.map((store: any, index: number) => (
                   <div className="col-md-6 col-lg-4 pt-3" key={index}>
                     <div className="store_card">
                       <div className="image_wrapper">
                         <img
-                          src={store.banner_image_url}
+                          src={store.banner_image}
                           className="shop_banner"
                         ></img>
-                        <img
-                          src={store.store_image_url}
-                          className="shop_img"
-                        ></img>
+                        <img src={store.store_image} className="shop_img"></img>
                       </div>
                       <div className="d-flex align-items-start gap-10 justify-content-center pt-4 mt-3">
                         <h1 className="store_name">{store.store_name}</h1>
@@ -160,12 +203,13 @@ const Stores = () => {
               )}
             </div>
 
-            <Pagination
+            <ApiPagination
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalItems}
               itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
+              onPageChange={handlePageChange}
+              loading={loading}
               showInfo={true}
             />
           </div>

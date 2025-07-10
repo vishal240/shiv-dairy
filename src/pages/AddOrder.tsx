@@ -6,6 +6,9 @@ import prod from "../assets/prod.jpg";
 import { ChevronLeft, ChevronRight, ShoppingBag } from "react-feather";
 
 const AddOrder = () => {
+  const handleSearch = (value: string) => {
+    console.log(value);
+  };
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
@@ -22,7 +25,7 @@ const AddOrder = () => {
           <div className="card_cmn">
             <div className="d-md-flex pb-3 pb-md-0 justify-content-between">
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={handleSearch}></Search>
                 <Filters></Filters>
               </div>
             </div>

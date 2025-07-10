@@ -10,16 +10,15 @@ import {
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 
-const DateRangePicker: React.FC = () => {
+interface DateRangePickerProps {
+  onDateChange: (startDate: any, endDate: any) => void;
+}
+const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateChange }) => {
   const [selectionRange, setSelectionRange] = useState({
     startDate: subDays(new Date(), 29),
     endDate: new Date(),
     key: "selection",
   });
-
-  useEffect(() => {
-    console.log(selectionRange);
-  }, [selectionRange]);
 
   const [hasSelected, setHasSelected] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
@@ -84,11 +83,13 @@ const DateRangePicker: React.FC = () => {
       key: "selection",
     });
     setHasSelected(true);
+    onDateChange(range.startDate, range.endDate);
   };
 
   const handlePresetClick = (preset: any) => {
     setSelectionRange({ ...preset.range(), key: "selection" });
     setHasSelected(true);
+    onDateChange(preset.range().startDate, preset.range().endDate);
   };
 
   // Outside click detection

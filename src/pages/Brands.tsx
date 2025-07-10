@@ -9,19 +9,52 @@ import Table, {
   type TableColumn,
   type TableRow,
 } from "../components/Table/Table";
-import Pagination from "../components/Pagination/Pagination";
-import { usePagination } from "../hooks/usePagination";
 import { useTableSelection } from "../hooks/useTableSelection";
-import { useEffect, useState } from "react";
 import ApiService from "../services/api";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import ApiPagination from "../components/Pagination/ApiPagination";
+import { useApiPagination } from "../hooks/useApiPagination";
 
 const Brands = () => {
-  const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // API call function
+  const fetchBrands = async (
+    page: number,
+    limit: number,
+    search: string,
+    startDate: string,
+    endDate: string
+  ) => {
+    return await ApiService.post("/admin/listBrands", {
+      filters: { search: search, startdate: startDate, enddate: endDate },
+      sorters: {},
+      pagination: {
+        page: page.toString(),
+        pageSize: limit.toString(),
+      },
+    });
+  };
+
+  // Use API pagination hook
+  const {
+    data: brands,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    loading,
+    error,
+    goToPage,
+    goToSearch,
+    goToDateSearch,
+    refresh,
+  } = useApiPagination({
+    apiCall: fetchBrands,
+    itemsPerPage: 10,
+    initialPage: 1,
+  });
   // Transform categories data for table
   const tableData: TableRow[] = brands.map((brand: any, index: number) => ({
     id: brand._id || index,
@@ -29,20 +62,6 @@ const Brands = () => {
     dateAdded: dayjs(brand.created_on).format("DD/MM/YYYY | HH:mm A"),
     status: brand.is_deleted ? "Inactive" : "Active",
   }));
-
-  // Pagination hook
-  const {
-    currentPage,
-    totalPages,
-    totalItems,
-    itemsPerPage,
-    paginatedData,
-    goToPage,
-  } = usePagination({
-    data: tableData,
-    itemsPerPage: 10,
-  });
-
   // Selection hook
   const { selectedRows, selectRow, toggleSelectAll, getSelectedCount } =
     useTableSelection();
@@ -109,40 +128,20 @@ const Brands = () => {
 
   // Handle select all
   const handleSelectAll = () => {
-    const allRowIds = paginatedData.map((row) => row.id);
+    const allRowIds = brands.map((row) => row.id);
     toggleSelectAll(allRowIds);
   };
 
-  useEffect(() => {
-    getBrands();
-  }, []);
-
-  const getBrands = () => {
-    setLoading(true);
-    ApiService.post("/admin/listBrands", {})
-      .then((res: any) => {
-        console.log(res);
-        setBrands(res.data.list);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
   const deleteBrands = () => {
-    setLoading(true);
     ApiService.post("/admin/deleteBrand", {
       brand_id: selectedRows.toString(),
     })
       .then((res: any) => {
         alert(res.message);
-        getBrands();
+        refresh();
       })
       .catch((err: any) => {
         alert(err.response.data.message);
-      })
-      .finally(() => {
-        setLoading(false);
       });
   };
   const deleteItem = (rowId: string | number) => {
@@ -151,11 +150,24 @@ const Brands = () => {
     })
       .then((res: any) => {
         alert(res.message);
-        getBrands();
+        refresh();
       })
       .catch((err: any) => {
         alert(err.response.data.message);
       });
+  };
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    goToPage(page);
+  };
+  const handleSearch = (value: string) => {
+    goToSearch(value);
+  };
+  const handleDateChange = (startDate: any, endDate: any) => {
+    goToDateSearch(
+      dayjs(startDate).format("YYYY-MM-DD"),
+      dayjs(endDate).format("YYYY-MM-DD")
+    );
   };
   return (
     <div className="container-fluid">
@@ -184,9 +196,11 @@ const Brands = () => {
                 <p className="card_subheading">Brands List</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
-                <Filters></Filters>
-                <DateRangePicker></DateRangePicker>
+                <Search onSearch={handleSearch}></Search>
+                {/* <Filters></Filters> */}
+                <DateRangePicker
+                  onDateChange={handleDateChange}
+                ></DateRangePicker>
                 <button
                   onClick={() => {
                     deleteBrands();
@@ -202,11 +216,30 @@ const Brands = () => {
                   <Trash></Trash>
                   Delete ({getSelectedCount()})
                 </button>
+                <button
+                  onClick={refresh}
+                  className="common-button"
+                  disabled={loading}
+                >
+                  Refresh
+                </button>
               </div>
             </div>
+            {error && (
+              <div
+                className="alert alert-danger"
+                style={{
+                  fontSize: "12px",
+                  padding: "8px",
+                  marginBottom: "15px",
+                }}
+              >
+                {error}
+              </div>
+            )}
             <Table
               columns={columns}
-              data={paginatedData}
+              data={tableData}
               loading={loading}
               selectable={true}
               selectedRows={selectedRows}
@@ -216,12 +249,13 @@ const Brands = () => {
               emptyMessage="No brands found"
             />
 
-            <Pagination
+            <ApiPagination
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalItems}
               itemsPerPage={itemsPerPage}
-              onPageChange={goToPage}
+              onPageChange={handlePageChange}
+              loading={loading}
               showInfo={true}
             />
           </div>

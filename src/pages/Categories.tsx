@@ -184,9 +184,9 @@ const Categories = () => {
                 <p className="card_subheading">Categories List</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                {/* <Search></Search>
                 <Filters></Filters>
-                <DateRangePicker></DateRangePicker>
+                <DateRangePicker></DateRangePicker> */}
                 <button
                   onClick={() => {
                     deleteCategories();

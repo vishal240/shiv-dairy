@@ -27,7 +27,7 @@ const SelectStore = () => {
           <div className="card_cmn">
             <div className="d-md-flex pb-3 pb-md-0 justify-content-between">
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                <Search onSearch={() => {}}></Search>
                 <Filters></Filters>
               </div>
               <div className="pt-3 pt-md-0">

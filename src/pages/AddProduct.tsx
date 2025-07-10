@@ -91,7 +91,7 @@ const productSchema = yup.object({
 
 const statusOptions = [
   { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
+  { value: "draft", label: "Draft" },
 ];
 
 const discountTypeOptions = [
@@ -213,7 +213,7 @@ const AddProduct = () => {
   const loadCategories = () => {
     ApiService.post("/admin/getCategoryList", {})
       .then((response: any) => {
-        setCategories(response.data || []);
+        setCategories(response.data.list || []);
       })
       .catch((error: any) => {
         console.error("Error loading categories:", error);
@@ -237,12 +237,36 @@ const AddProduct = () => {
       .then((response: any) => {
         const product = response.data;
         console.log(product);
+        setValue("product_name", product.product_name);
+        setValue("store_id", product.store_id._id);
+        setValue("category_id", product.category_id._id);
+        setValue("sub_category_id", product.subcategory_id._id);
+        setValue("brand_id", product.brand_id._id);
+        setValue("b2b_batch_qty", product.pricing_b2b.batch);
+        setValue("b2b_min_batch_qty", product.pricing_b2b.batch_quantity);
+        setValue("b2b_discount_type", product.pricing_b2b.discount_type);
+        setValue(
+          "b2b_discount_percentage",
+          product.pricing_b2b.discount_percentage
+        );
+        setValue("b2b_unit_price", product.pricing_b2b.price);
+        setValue("b2b_amount", product.pricing_b2b.final_price);
+        setValue("b2c_qty", product.pricing_b2c.quantity);
+        setValue("b2c_discount_type", product.pricing_b2c.discount_type);
+        setValue(
+          "b2c_discount_percentage",
+          product.pricing_b2c.discount_percentage
+        );
+        setValue("b2c_unit_price", product.pricing_b2c.price);
+        setValue("b2c_amount", product.pricing_b2c.final_price);
+        setValue("status", product.status);
+        console.log(product);
         // Populate form with product data
-        Object.keys(product).forEach((key) => {
-          if (key in product) {
-            setValue(key as keyof ProductFormData, product[key]);
-          }
-        });
+        // Object.keys(product).forEach((key) => {
+        //   if (key in product) {
+        //     setValue(key as keyof ProductFormData, product[key]);
+        //   }
+        // });
       })
       .catch((error: any) => {
         console.error("Error loading product:", error);

@@ -33,9 +33,9 @@ const Customers = () => {
                 <p className="card_subheading">Customer List</p>
               </div>
               <div className="d-flex gap-10 align-items-center ">
-                <Search></Search>
+                {/* <Search></Search>
                 <Filters></Filters>
-                <DateRangePicker></DateRangePicker>
+                <DateRangePicker></DateRangePicker> */}
                 <button className="common-button text-red">
                   <Trash></Trash>
                   Delete
@@ -91,99 +91,7 @@ const Customers = () => {
                     <span className="status in">Active </span>
                   </td>
                   <td>24/10/2025</td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>+91 62617 01016</td>
-                  <td>25</td>
-                  <td>₹1.221.00</td>
-                  <td>
-                    <span className="status in">Active </span>
-                  </td>
-                  <td>24/10/2025</td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>+91 62617 01016</td>
-                  <td>25</td>
-                  <td>₹1.221.00</td>
-                  <td>
-                    <span className="status in">Active </span>
-                  </td>
-                  <td>24/10/2025</td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <input
-                      id="chx2"
-                      className="chx_input"
-                      type="checkbox"
-                    ></input>
-                    <label className="chx_lbl" htmlFor="chx2">
-                      <Check></Check>
-                    </label>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="">
-                        <p className="products_name">Jhon Doe</p>
-                        <span className="sku">jhondow@gmail.com</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>+91 62617 01016</td>
-                  <td>25</td>
-                  <td>₹1.221.00</td>
-                  <td>
-                    <span className="status in">Active </span>
-                  </td>
-                  <td>24/10/2025</td>
-                  <td>
-                    <Actions></Actions>
-                  </td>
+                  <td>{/* <Actions></Actions> */}</td>
                 </tr>
               </tbody>
             </table>
