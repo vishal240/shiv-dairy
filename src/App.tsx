@@ -96,6 +96,7 @@ function App() {
             <Route path="addbrands" element={<AddBrands />} />
             <Route path="editbrands/:id" element={<AddBrands />} />
             <Route path="addcustomer" element={<AddCustomer />} />
+            <Route path="editcustomer/:id" element={<AddCustomer />} />
             <Route path="addpurchase" element={<AddPurchase />} />
             <Route path="myprofile" element={<Myprofile />} />
             <Route path="customerdetails" element={<CustomerDetails />} />
