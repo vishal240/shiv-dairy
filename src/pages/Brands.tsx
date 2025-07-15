@@ -1,7 +1,5 @@
-import { Check, ChevronLeft, ChevronRight, Trash } from "react-feather";
-import Filters from "../components/Filters";
+import { Trash } from "react-feather";
 import Search from "../components/Search";
-import milk from "../assets/milk.jpg";
 import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
 import Actions from "../components/Actions";

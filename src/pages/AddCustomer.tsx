@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import Input from "../components/inputs/Input";
-import Select from "../components/inputs/Select";
 import ImageUpload from "../components/inputs/ImageUpload";
 import type { CustomerFormData } from "../types/customer";
 import ApiService from "../services/api";
@@ -77,6 +76,14 @@ const customerSchema = yup.object({
     .string()
     .required("Billing ZIP code is required")
     .matches(/^[\d\-\s]{3,10}$/, "Please enter a valid ZIP code"),
+  country_code_primary: yup
+    .string()
+    .required("Country code is required")
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
+  country_code: yup
+    .string()
+    .optional()
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
 
   // Shipping Address
   shippingAddress: yup
@@ -108,18 +115,28 @@ const customerSchema = yup.object({
     .required("Shipping ZIP code is required")
     .matches(/^[\d\-\s]{3,10}$/, "Please enter a valid ZIP code"),
 
-  // Status
-  status: yup.string().required("Status is required"),
+  businessName: yup
+    .string()
+    .required("Business name is required")
+    .min(2, "Business name must be at least 2 characters")
+    .max(100, "Business name must not exceed 100 characters"),
+  business_country_code: yup
+    .string()
+    .required("Business country code is required")
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
+  businessPhone: yup
+    .string()
+    .required("Business phone is required")
+    .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
+
+  businessEmail: yup
+    .string()
+    .required("Business email is required")
+    .email("Please enter a valid email address"),
 
   // Customer Image (optional)
   customerImage: yup.mixed().optional(),
 });
-
-const statusOptions = [
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-  { value: "pending", label: "Pending" },
-];
 
 const AddCustomer = () => {
   const navigate = useNavigate();
@@ -136,9 +153,7 @@ const AddCustomer = () => {
     watch,
   } = useForm<CustomerFormData>({
     resolver: yupResolver(customerSchema) as any,
-    defaultValues: {
-      status: "active",
-    },
+    defaultValues: {},
   });
 
   // Watch billing address fields for copying to shipping
@@ -164,39 +179,58 @@ const AddCustomer = () => {
       setValue("shippingCountry", billingCountry || "");
       setValue("shippingZip", billingZip || "");
     }
-  }, [copyBillingToShipping, billingAddress, billingCity, billingState, billingCountry, billingZip, setValue]);
+  }, [
+    copyBillingToShipping,
+    billingAddress,
+    billingCity,
+    billingState,
+    billingCountry,
+    billingZip,
+    setValue,
+  ]);
 
   const loadCustomer = (customerId: string) => {
     setLoading(true);
-    ApiService.post("/admin/getCustomerDetails", {
+    ApiService.post("/admin/detailCustomer", {
       customer_id: customerId,
     })
       .then((response: any) => {
         const customer = response.data;
-        
+        console.log(customer);
         // Populate form with customer data
-        setValue("firstName", customer.firstName || "");
-        setValue("lastName", customer.lastName || "");
-        setValue("primaryPhone", customer.primaryPhone || "");
-        setValue("primaryEmail", customer.primaryEmail || "");
-        setValue("secondaryPhone", customer.secondaryPhone || "");
-        setValue("secondaryEmail", customer.secondaryEmail || "");
-        
+        setValue("firstName", customer.customer.fname || "");
+        setValue("lastName", customer.customer.lname || "");
+        setValue(
+          "country_code_primary",
+          customer.customer.country_code_primary || ""
+        );
+        setValue("primaryPhone", customer.customer.phone_primary || "");
+        setValue("primaryEmail", customer.customer.email_primary || "");
+        setValue("country_code", customer.customer.country_code || "");
+        setValue("secondaryPhone", customer.customer.phone_number || "");
+        setValue("secondaryEmail", customer.customer.email || "");
+
         // Billing address
-        setValue("billingAddress", customer.billingAddress?.address || "");
-        setValue("billingCity", customer.billingAddress?.city || "");
-        setValue("billingState", customer.billingAddress?.state || "");
-        setValue("billingCountry", customer.billingAddress?.country || "");
-        setValue("billingZip", customer.billingAddress?.zip || "");
-        
+        setValue("billingAddress", customer.address?.street_1 || "");
+        setValue("billingCity", customer.address?.city || "");
+        setValue("billingState", customer.address?.state || "");
+        setValue("billingCountry", customer.address?.country || "");
+        setValue("billingZip", customer.address?.zip || "");
+
         // Shipping address
-        setValue("shippingAddress", customer.shippingAddress?.address || "");
-        setValue("shippingCity", customer.shippingAddress?.city || "");
-        setValue("shippingState", customer.shippingAddress?.state || "");
-        setValue("shippingCountry", customer.shippingAddress?.country || "");
-        setValue("shippingZip", customer.shippingAddress?.zip || "");
-        
-        setValue("status", customer.status || "active");
+        setValue("shippingAddress", customer.business_address?.street_1 || "");
+        setValue("shippingCity", customer.business_address?.city || "");
+        setValue("shippingState", customer.business_address?.state || "");
+        setValue("shippingCountry", customer.business_address?.country || "");
+        setValue("shippingZip", customer.business_address?.zip || "");
+
+        setValue("businessName", customer.business?.business_name || "");
+        setValue(
+          "business_country_code",
+          customer.business?.business_country_code || ""
+        );
+        setValue("businessPhone", customer.business?.business_phone || "");
+        setValue("businessEmail", customer.business?.business_email || "");
       })
       .catch((error) => {
         console.error("Error loading customer:", error);
@@ -211,38 +245,49 @@ const AddCustomer = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      
+
       // Personal information
-      formData.append("firstName", data.firstName);
-      formData.append("lastName", data.lastName);
-      formData.append("primaryPhone", data.primaryPhone);
-      formData.append("primaryEmail", data.primaryEmail);
-      formData.append("secondaryPhone", data.secondaryPhone || "");
-      formData.append("secondaryEmail", data.secondaryEmail || "");
-      
+      formData.append("fname", data.firstName);
+      formData.append("lname", data.lastName);
+      formData.append("country_code_primary", data.country_code_primary);
+      formData.append("phone_primary", data.primaryPhone);
+      formData.append("email_primary", data.primaryEmail);
+      formData.append("country_code", data.country_code);
+      formData.append("phone_number", data.secondaryPhone || "");
+      formData.append("email", data.secondaryEmail || "");
+
+      formData.append("business_name", data.businessName);
+      formData.append("business_country_code", data.business_country_code);
+      formData.append("business_phone", data.businessPhone);
+      formData.append("business_email", data.businessEmail);
+
       // Billing address
-      formData.append("billingAddress", JSON.stringify({
-        address: data.billingAddress,
-        city: data.billingCity,
-        state: data.billingState,
-        country: data.billingCountry,
-        zip: data.billingZip,
-      }));
-      
+      formData.append(
+        "customer_address",
+        JSON.stringify({
+          street_1: data.billingAddress,
+          city: data.billingCity,
+          state: data.billingState,
+          country: data.billingCountry,
+          zip: data.billingZip,
+        })
+      );
+
       // Shipping address
-      formData.append("shippingAddress", JSON.stringify({
-        address: data.shippingAddress,
-        city: data.shippingCity,
-        state: data.shippingState,
-        country: data.shippingCountry,
-        zip: data.shippingZip,
-      }));
-      
-      formData.append("status", data.status);
-      
+      formData.append(
+        "business_address",
+        JSON.stringify({
+          street_1: data.shippingAddress,
+          city: data.shippingCity,
+          state: data.shippingState,
+          country: data.shippingCountry,
+          zip: data.shippingZip,
+        })
+      );
+
       // Customer image
       if (data.customerImage && data.customerImage.length > 0) {
-        formData.append("customerImage", data.customerImage[0]);
+        formData.append("file", data.customerImage[0]);
       }
 
       const endpoint = id ? "/admin/editCustomer" : "/admin/createCustomer";
@@ -349,7 +394,18 @@ const AddCustomer = () => {
                         disabled={loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
+                    <div className="col-md-2 pt-3">
+                      <Input
+                        control={control}
+                        name="country_code_primary"
+                        label="Country Code"
+                        type="tel"
+                        placeholder="Enter country code"
+                        error={errors.country_code_primary?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="col-md-4 pt-3">
                       <Input
                         control={control}
                         name="primaryPhone"
@@ -371,7 +427,18 @@ const AddCustomer = () => {
                         disabled={loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
+                    <div className="col-md-2 pt-3">
+                      <Input
+                        control={control}
+                        name="country_code"
+                        label="Country Code"
+                        type="tel"
+                        placeholder="Enter country code"
+                        error={errors.country_code?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="col-md-4 pt-3">
                       <Input
                         control={control}
                         name="secondaryPhone"
@@ -403,7 +470,7 @@ const AddCustomer = () => {
               <div className="col-12">
                 <div className="card_cmn">
                   <div className="row">
-                    <h5 className="card_heading">Billing Address</h5>
+                    <h5 className="card_heading">Customer Address</h5>
                   </div>
                   <div className="row">
                     <div className="col-md-12 pt-3">
@@ -466,13 +533,69 @@ const AddCustomer = () => {
               </div>
             </div>
 
+            <div className="row px-2 pt-3">
+              <div className="col-12">
+                <div className="card_cmn">
+                  <div className="row">
+                    <h5 className="card_heading">Business Information</h5>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-6 pt-3">
+                      <Input
+                        control={control}
+                        name="businessName"
+                        label="Business Name"
+                        type="text"
+                        placeholder="Enter business name"
+                        error={errors.businessName?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="col-md-6 pt-3">
+                      <Input
+                        control={control}
+                        name="businessEmail"
+                        label="Business Email"
+                        type="email"
+                        placeholder="Enter business email"
+                        error={errors.businessEmail?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="col-md-2 pt-3">
+                      <Input
+                        control={control}
+                        name="business_country_code"
+                        label="Country Code"
+                        type="tel"
+                        placeholder="Enter country code"
+                        error={errors.business_country_code?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="col-md-4 pt-3">
+                      <Input
+                        control={control}
+                        name="businessPhone"
+                        label="Business Phone"
+                        type="tel"
+                        placeholder="Enter business phone number"
+                        error={errors.businessPhone?.message}
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Shipping Address */}
             <div className="row px-2 pt-3">
               <div className="col-12">
                 <div className="card_cmn">
                   <div className="row">
                     <div className="col-md-8">
-                      <h5 className="card_heading">Shipping Address</h5>
+                      <h5 className="card_heading">Business Address</h5>
                     </div>
                     <div className="col-md-4 pt-2">
                       <div className="d-flex align-items-center gap-2">
@@ -480,14 +603,16 @@ const AddCustomer = () => {
                           type="checkbox"
                           id="copyBilling"
                           checked={copyBillingToShipping}
-                          onChange={(e) => handleCopyBillingToShipping(e.target.checked)}
+                          onChange={(e) =>
+                            handleCopyBillingToShipping(e.target.checked)
+                          }
                           className="chx_input"
                         />
                         <label htmlFor="copyBilling" className="chx_lbl">
                           <Check />
                         </label>
                         <label htmlFor="copyBilling" className="font-12">
-                          Same as billing address
+                          Same as customer address
                         </label>
                       </div>
                     </div>
@@ -546,29 +671,6 @@ const AddCustomer = () => {
                         placeholder="Enter ZIP code"
                         error={errors.shippingZip?.message}
                         disabled={loading || copyBillingToShipping}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Status */}
-            <div className="row px-2 pt-3">
-              <div className="col-12">
-                <div className="card_cmn">
-                  <div className="row">
-                    <h5 className="card_heading">Status</h5>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-4 pt-3">
-                      <Select
-                        control={control}
-                        name="status"
-                        label="Status"
-                        options={statusOptions}
-                        error={errors.status?.message}
-                        disabled={loading}
                       />
                     </div>
                   </div>

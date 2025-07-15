@@ -38,7 +38,7 @@ const storeSchema = yup.object({
 
   countryCode: yup
     .string()
-    .required("Country code is required")
+    .optional()
     .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
 
   primaryEmail: yup

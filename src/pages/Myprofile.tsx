@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Edit, Mail, MapPin, Phone, User, Check, X } from "react-feather";
+import { Edit, Mail, MapPin, Phone, Check, X } from "react-feather";
 import { useState, useEffect } from "react";
 
 import Input from "../components/inputs/Input";
@@ -20,7 +20,7 @@ const profileSchema = yup.object({
     .required("Name is required")
     .min(2, "Name must be at least 2 characters")
     .max(100, "Name must not exceed 100 characters"),
-  user_id: yup.string(),
+  // user_id: yup.string(),
   // .required("User ID is required")
   // .min(3, "User ID must be at least 3 characters")
   // .max(50, "User ID must not exceed 50 characters")
@@ -32,9 +32,14 @@ const profileSchema = yup.object({
     .string()
     .required("Email is required")
     .email("Please enter a valid email address"),
-  phone: yup.string(),
-  // .required("Phone is required")
-  // .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
+  country_code: yup
+    .string()
+    .required("Country code is required")
+    .matches(/^\+\d{1,4}$/, "Must start with '+' and have 1 to 4 digits"),
+  phone_number: yup
+    .string()
+    .required("Phone is required")
+    .matches(/^[+]?[\d\s\-()]{10,15}$/, "Please enter a valid phone number"),
   address: yup
     .string()
     .required("Address is required")
@@ -59,38 +64,6 @@ const profileSchema = yup.object({
     .required("Country is required")
     .min(2, "Country must be at least 2 characters")
     .max(50, "Country must not exceed 50 characters"),
-
-  // Change Password (optional fields)
-  new_password: yup
-    .string()
-    .optional()
-    .test(
-      "password-strength",
-      "Password must be at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
-      function (value) {
-        if (!value) return true; // Optional field
-        return (
-          value.length >= 8 &&
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
-            value
-          )
-        );
-      }
-    ),
-  old_password: yup.string().when("new_password", {
-    is: (new_password: string) => new_password && new_password.length > 0,
-    then: (schema) =>
-      schema.required("Old password is required to change password"),
-    otherwise: (schema) => schema.optional(),
-  }),
-  confirm_password: yup.string().when("new_password", {
-    is: (new_password: string) => new_password && new_password.length > 0,
-    then: (schema) =>
-      schema
-        .required("Please confirm your new password")
-        .oneOf([yup.ref("new_password")], "Passwords must match"),
-    otherwise: (schema) => schema.optional(),
-  }),
 
   // Profile Image (optional)
   profile_image: yup.mixed().optional(),
@@ -146,14 +119,14 @@ const Myprofile = () => {
     ApiService.post("/admin/getAdminDetails", {})
       .then((response: any) => {
         const profile = response.data;
-        console.log(profile);
+        // console.log(profile);
         setProfileData(profile);
 
         // Populate form with profile data
         setValue("admin_name", profile.admin_name || "");
-        setValue("user_id", profile.user_id || "");
         setValue("email", profile.email || "");
-        setValue("phone", profile.phone || "");
+        setValue("country_code", profile.country_code || "");
+        setValue("phone_number", profile.phone_number || "");
         setValue("address", profile.address?.street_1 || "");
         setValue("city", profile.address?.city || "");
         setValue("state", profile.address?.state || "");
@@ -178,7 +151,7 @@ const Myprofile = () => {
       formData.append("admin_name", data.admin_name);
       // formData.append("user_id", data.user_id);
       formData.append("email", data.email);
-      // formData.append("phone", data.phone);
+      formData.append("phone_number", data.phone_number);
       formData.append(
         "address",
         JSON.stringify({
@@ -315,16 +288,6 @@ const Myprofile = () => {
 
             <div className="d-flex gap-10 px-md-2">
               <span className="shop_icon">
-                <User />
-              </span>
-              <div>
-                <p className="font-12 color-grey mb-0">User ID</p>
-                <p className="font-12">{profileData?.user_id || "N/A"}</p>
-              </div>
-            </div>
-
-            <div className="d-flex gap-10 px-md-2">
-              <span className="shop_icon">
                 <Mail />
               </span>
               <div>
@@ -339,7 +302,7 @@ const Myprofile = () => {
               </span>
               <div>
                 <p className="font-12 color-grey mb-0">Phone</p>
-                <p className="font-12">{profileData?.phone || "N/A"}</p>
+                <p className="font-12">{profileData?.phone_number || "N/A"}</p>
               </div>
             </div>
 
@@ -379,17 +342,7 @@ const Myprofile = () => {
                         disabled={!isEditing || loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
-                      <Input
-                        control={control}
-                        name="user_id"
-                        label="User ID"
-                        type="text"
-                        placeholder="Enter user ID"
-                        error={errors.user_id?.message}
-                        disabled={!isEditing || loading}
-                      />
-                    </div>
+
                     <div className="col-md-6 pt-3">
                       <Input
                         control={control}
@@ -401,14 +354,25 @@ const Myprofile = () => {
                         disabled={!isEditing || loading}
                       />
                     </div>
-                    <div className="col-md-6 pt-3">
+                    <div className="col-md-2 pt-3">
                       <Input
                         control={control}
-                        name="phone"
+                        name="country_code"
+                        label="Country Code"
+                        type="text"
+                        placeholder="Enter country code"
+                        error={errors.country_code?.message}
+                        disabled={!isEditing || loading}
+                      />
+                    </div>
+                    <div className="col-md-4 pt-3">
+                      <Input
+                        control={control}
+                        name="phone_number"
                         label="Phone"
                         type="tel"
                         placeholder="Enter phone number"
-                        error={errors.phone?.message}
+                        error={errors.phone_number?.message}
                         disabled={!isEditing || loading}
                       />
                     </div>

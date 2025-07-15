@@ -5,50 +5,49 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { lazy } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
+const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
+const PublicRoute = lazy(() => import("./components/PublicRoute"));
 
 // Layouts
-import AuthenticatedLayout from "./layouts/AuthenticatedLayout";
-import PublicLayout from "./layouts/PublicLayout";
+const AuthenticatedLayout = lazy(() => import("./layouts/AuthenticatedLayout"));
+const PublicLayout = lazy(() => import("./layouts/PublicLayout"));
 
 // Auth pages
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Login from "./pages/Login";
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Login = lazy(() => import("./pages/Login"));
 
 // Protected pages
-import Dashboard from "./pages/Dashboard";
-import Orders from "./pages/Orders";
-import Stores from "./pages/Stores";
-import Products from "./pages/Products";
-import Categories from "./pages/Categories";
-import Brands from "./pages/Brands";
-import Transactions from "./pages/Transactions";
-import Customers from "./pages/Customers";
-import Purchase from "./pages/Purchase";
-import Support from "./pages/Support";
-import AddStore from "./pages/AddStore";
-import ViewStore from "./pages/ViewStore";
-import AddOrder from "./pages/AddOrder";
-import SelectStore from "./pages/SelectStore";
-import Checkout from "./pages/Checkout";
-import AddProduct from "./pages/AddProduct";
-import OrderDetails from "./pages/OrderDetails";
-import AddCategories from "./pages/AddCategories";
-import AddBrands from "./pages/AddBrands";
-import AddCustomer from "./pages/AddCustomer";
-import AddPurchase from "./pages/AddPurchase";
-import Myprofile from "./pages/Myprofile";
-import CustomerDetails from "./pages/CustomerDetails";
-import Invoice from "./pages/Invoice";
-import CategoriesWithApi from "./pages/CategoriesWithApi";
-
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Stores = lazy(() => import("./pages/Stores"));
+const Products = lazy(() => import("./pages/Products"));
+const Brands = lazy(() => import("./pages/Brands"));
+const Transactions = lazy(() => import("./pages/Transactions"));
+const Customers = lazy(() => import("./pages/Customers"));
+const Purchase = lazy(() => import("./pages/Purchase"));
+const Support = lazy(() => import("./pages/Support"));
+const AddStore = lazy(() => import("./pages/AddStore"));
+const ViewStore = lazy(() => import("./pages/ViewStore"));
+const AddOrder = lazy(() => import("./pages/AddOrder"));
+const SelectStore = lazy(() => import("./pages/SelectStore"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const AddProduct = lazy(() => import("./pages/AddProduct"));
+const OrderDetails = lazy(() => import("./pages/OrderDetails"));
+const AddCategories = lazy(() => import("./pages/AddCategories"));
+const AddBrands = lazy(() => import("./pages/AddBrands"));
+const AddCustomer = lazy(() => import("./pages/AddCustomer"));
+const AddPurchase = lazy(() => import("./pages/AddPurchase"));
+const Myprofile = lazy(() => import("./pages/Myprofile"));
+const CustomerDetails = lazy(() => import("./pages/CustomerDetails"));
+const Invoice = lazy(() => import("./pages/Invoice"));
+const CategoriesWithApi = lazy(() => import("./pages/CategoriesWithApi"));
 function App() {
   return (
     <AuthProvider>
-      <Router basename="/shivdairyadmin">
+      <Router basename="/admin">
         <Routes>
           {/* Public routes - only accessible when NOT authenticated */}
           <Route

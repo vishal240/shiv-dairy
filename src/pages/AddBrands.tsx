@@ -1,9 +1,7 @@
-import { Check, Minus, X } from "react-feather";
+import { Check, X } from "react-feather";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import dummy from "../assets/img-dummy.jpg";
-import shop from "../assets/shop.jpg";
 import Input from "../components/inputs/Input";
 import type { Brand } from "../types/brands";
 import { useEffect, useState } from "react";

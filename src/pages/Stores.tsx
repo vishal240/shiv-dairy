@@ -1,26 +1,16 @@
-import { ChevronLeft, ChevronRight, Mail, MapPin, Phone } from "react-feather";
-import Filters from "../components/Filters";
+import { Mail, MapPin, Phone } from "react-feather";
 import Search from "../components/Search";
-import amulbanner from "../assets/banner_amul.jpg";
-import logoamul from "../assets/logo-amul.webp";
-import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
-import { useEffect, useState } from "react";
 import ApiService from "../services/api";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import ApiPagination from "../components/Pagination/ApiPagination";
 import { useApiPagination } from "../hooks/useApiPagination";
-import { subDays } from "date-fns";
-import type { RangeKeyDict } from "react-date-range";
+import DateRangePicker from "../components/DateRangePicker";
+
 const Stores = () => {
   const navigate = useNavigate();
-  const [selectionRange, setSelectionRange] = useState({
-    startDate: subDays(new Date(), 29),
-    endDate: new Date(),
-    key: "selection",
-  });
-  const [hasSelected, setHasSelected] = useState(false);
+
   // API call function
   const fetchStores = async (
     page: number,

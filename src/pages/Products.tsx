@@ -1,18 +1,15 @@
-import Filters from "../components/Filters";
 import Search from "../components/Search";
 import { DeleteConfirmationModal } from "../components/DeleteConfirmationModal";
-import prod from "../assets/prod.jpg";
 import DateRangePicker from "../components/DateRangePicker";
 import ImportExport from "../components/ImportExport";
-import { ChevronLeft, ChevronRight } from "react-feather";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ApiService from "../services/api";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import ApiPagination from "../components/Pagination/ApiPagination";
 import { useApiPagination } from "../hooks/useApiPagination";
 
-const Products = () => {
+const Products = ({ store_id }: { store_id?: string }) => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
@@ -40,13 +37,15 @@ const Products = () => {
     limit: number,
     search: string,
     startDate: string,
-    endDate: string
+    endDate: string,
+    store_id: string
   ) => {
     return await ApiService.post("/admin/listProducts", {
       filters: {
         search: search,
         startdate: startDate,
         enddate: endDate,
+        store_id: store_id,
       },
       sorters: {},
       pagination: {
@@ -71,6 +70,7 @@ const Products = () => {
     apiCall: fetchProducts,
     itemsPerPage: 10,
     initialPage: 1,
+    store_id: store_id,
   });
   const handlePageChange = (page: number) => {
     goToPage(page);

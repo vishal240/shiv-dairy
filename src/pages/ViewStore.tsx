@@ -20,15 +20,12 @@ const ViewStore = () => {
             <div className="row">
               <div className="col-md-6">
                 <div className="image_wrapper">
-                  <img
-                    src={store.banner_image_url}
-                    className="shop_banner"
-                  ></img>
+                  <img src={store.banner_image} className="shop_banner"></img>
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="d-flex align-items-start gap-10  pt-4 mt-3">
-                  <img src={store.store_image_url} className="shop_img2"></img>
+                  <img src={store.store_image} className="shop_img2"></img>
                   <div>
                     <h1 className="store_name mb-0">{store.store_name}</h1>
                     <span className="status in">
@@ -80,7 +77,7 @@ const ViewStore = () => {
         </div>
       </div>
 
-      <Products />
+      <Products store_id={store._id} />
     </div>
   );
 };

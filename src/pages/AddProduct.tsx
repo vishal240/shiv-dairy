@@ -239,6 +239,7 @@ const AddProduct = () => {
         console.log(product);
         setValue("product_name", product.product_name);
         setValue("store_id", product.store_id._id);
+        setValue("description", product.description);
         setValue("category_id", product.category_id._id);
         setValue("sub_category_id", product.subcategory_id._id);
         setValue("brand_id", product.brand_id._id);

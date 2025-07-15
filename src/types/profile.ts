@@ -3,7 +3,8 @@ export interface ProfileFormData {
   admin_name: string;
   user_id: string;
   email: string;
-  phone: string;
+  country_code: string;
+  phone_number: string;
   address: string;
   city: string;
   state: string;
@@ -27,7 +28,7 @@ export interface AdminProfile {
   admin_name: string;
   user_id: string;
   email: string;
-  phone: string;
+  phone_number: string;
   address: {
     street_1: string;
     city: string;

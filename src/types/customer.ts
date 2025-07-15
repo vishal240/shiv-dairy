@@ -6,6 +6,8 @@ export interface CustomerFormData {
   primaryEmail: string;
   secondaryPhone?: string;
   secondaryEmail?: string;
+  country_code_primary: string;
+  country_code: string;
 
   // Billing Address
   billingAddress: string;
@@ -21,8 +23,10 @@ export interface CustomerFormData {
   shippingCountry: string;
   shippingZip: string;
 
-  // Status
-  status: string;
+  businessName: string;
+  business_country_code: string;
+  businessPhone: string;
+  businessEmail: string;
 
   // Customer Image (optional)
   customerImage?: FileList;
@@ -39,6 +43,8 @@ export interface Customer {
   primaryEmail: string;
   secondaryPhone?: string;
   secondaryEmail?: string;
+  country_code_primary: string;
+  country_code: string;
   billingAddress: {
     address: string;
     city: string;
@@ -53,7 +59,10 @@ export interface Customer {
     country: string;
     zip: string;
   };
-  status: string;
+  businessName: string;
+  business_country_code: string;
+  businessPhone: string;
+  businessEmail: string;
   customerImage?: string;
   created_on: string;
   is_deleted: boolean;

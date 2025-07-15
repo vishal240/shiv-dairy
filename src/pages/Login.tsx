@@ -103,7 +103,7 @@ const Login = () => {
             style={{ cursor: "pointer", textDecoration: "underline" }}
             onClick={goToForgotPassword}
           >
-            Forgot Username/Password?
+            Forgot Password?
           </span>
         </p>
         <div>
