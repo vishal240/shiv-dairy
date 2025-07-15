@@ -97,6 +97,7 @@ function App() {
             <Route path="addcustomer" element={<AddCustomer />} />
             <Route path="editcustomer/:id" element={<AddCustomer />} />
             <Route path="addpurchase" element={<AddPurchase />} />
+            <Route path="editpurchase/:id" element={<AddPurchase />} />
             <Route path="myprofile" element={<Myprofile />} />
             <Route path="customerdetails" element={<CustomerDetails />} />
             <Route path="invoice" element={<Invoice />} />
