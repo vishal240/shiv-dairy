@@ -30,6 +30,8 @@ export interface CustomerFormData {
 
   // Customer Image (optional)
   customerImage?: FileList;
+  customer_document?: FileList;
+  business_document?: FileList;
 
   // Optional ID for editing
   customer_id?: string;
@@ -64,6 +66,8 @@ export interface Customer {
   businessPhone: string;
   businessEmail: string;
   customerImage?: string;
+  customer_document?: string;
+  business_document?: string;
   created_on: string;
   is_deleted: boolean;
 }

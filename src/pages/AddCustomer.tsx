@@ -136,6 +136,8 @@ const customerSchema = yup.object({
 
   // Customer Image (optional)
   customerImage: yup.mixed().optional(),
+  customer_document: yup.mixed().optional(),
+  business_document: yup.mixed().optional(),
 });
 
 const AddCustomer = () => {
@@ -288,6 +290,12 @@ const AddCustomer = () => {
       // Customer image
       if (data.customerImage && data.customerImage.length > 0) {
         formData.append("file", data.customerImage[0]);
+      }
+      if (data.customer_document && data.customer_document.length > 0) {
+        formData.append("customer_document", data.customer_document[0]);
+      }
+      if (data.business_document && data.business_document.length > 0) {
+        formData.append("business_document", data.business_document[0]);
       }
 
       const endpoint = id ? "/admin/editCustomer" : "/admin/createCustomer";
@@ -718,6 +726,40 @@ const AddCustomer = () => {
                         name="customerImage"
                         label="Customer Image (Optional)"
                         error={errors.customerImage?.message}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="col-12">
+                <div className="card_cmn">
+                  <div className="row">
+                    <h5 className="card_heading">Customer Document</h5>
+                  </div>
+                  <div className="row">
+                    <div className="col-12 pt-3">
+                      <ImageUpload
+                        control={control}
+                        name="customer_document"
+                        label="Customer Document (Optional)"
+                        error={errors.customer_document?.message}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="col-12">
+                <div className="card_cmn">
+                  <div className="row">
+                    <h5 className="card_heading">Business Document</h5>
+                  </div>
+                  <div className="row">
+                    <div className="col-12 pt-3">
+                      <ImageUpload
+                        control={control}
+                        name="business_document"
+                        label="Business Document (Optional)"
+                        error={errors.business_document?.message}
                       />
                     </div>
                   </div>

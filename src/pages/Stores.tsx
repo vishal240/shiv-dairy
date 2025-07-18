@@ -63,6 +63,29 @@ const Stores = () => {
       dayjs(endDate).format("YYYY-MM-DD")
     );
   };
+  const handleExport = () => {
+    if (!stores || stores.length === 0) {
+      console.error("No data available to export.");
+      return;
+    }
+
+    exportToCSV(stores, "stores.csv");
+  };
+  const exportToCSV = (data: any[], fileName: string) => {
+    const csvContent = data
+      .map((row) =>
+        Object.values(row)
+          .map((value) => `"${value}"`) // Wrap values in quotes to handle commas
+          .join(",")
+      )
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  };
   return (
     <div className="container-fluid">
       <div className="row px-2 pt-3">
@@ -77,7 +100,7 @@ const Stores = () => {
           <ImportExport
             onAdd={"/addstore"}
             onImport={() => {}}
-            onExport={() => {}}
+            onExport={handleExport}
           />
         </div>
       </div>
