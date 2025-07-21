@@ -7,6 +7,10 @@ import {
 } from "react-router-dom";
 import { lazy } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
+import Setting from "./pages/Setting";
+import Addpolicy from "./pages/Addpolicy";
+import Adddiscount from "./pages/Adddiscount";
+import Notifications from "./pages/Notifications";
 const ProtectedRoute = lazy(() => import("./components/ProtectedRoute"));
 const PublicRoute = lazy(() => import("./components/PublicRoute"));
 
@@ -101,6 +105,10 @@ function App() {
             <Route path="myprofile" element={<Myprofile />} />
             <Route path="customerdetails" element={<CustomerDetails />} />
             <Route path="invoice" element={<Invoice />} />
+            <Route path="settings" element={<Setting />} />
+            <Route path="addpolicy" element={<Addpolicy />} />
+            <Route path="adddiscount" element={<Adddiscount />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
           <Route path="*" element={<Navigate replace to="/" />} />
         </Routes>

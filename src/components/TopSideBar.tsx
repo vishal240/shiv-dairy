@@ -55,6 +55,9 @@ const TopSideBar = () => {
   const myProfile = () => {
     navigate("/myprofile");
   };
+  const setting = () => {
+    navigate("/setting");
+  };
 
   const handleLogout = () => {
     logout();
@@ -107,7 +110,7 @@ const TopSideBar = () => {
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#">
+                <a className="dropdown-item" href="#" onClick={setting}>
                   <Settings></Settings> Settings
                 </a>
               </li>
@@ -186,7 +189,12 @@ const TopSideBar = () => {
                 )}
               </Fragment>
             ))}
-
+            <li className="">
+              <Icons item="Settings" /> Settings
+            </li>
+            <li className="">
+              <Icons item="Bell" /> Notifications
+            </li>
             <li className="text-red" onClick={handleLogout}>
               <LogOut></LogOut>
               Log Out
