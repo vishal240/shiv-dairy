@@ -23,10 +23,25 @@ const TopSideBar = () => {
   const navigate = useNavigate();
   const locations = useLocation();
   const { logout } = useAuth();
+  const [notificationscount, setnotificationscount] = useState(0);
   useEffect(() => {
     getMenus();
     getAdminDetails();
+    getNotifications();
   }, []);
+  const getNotifications = async () => {
+    try {
+      await ApiService.post("/admin/getNotificationCount", {}).then(
+        (response: any) => {
+          if (response.status === 200) {
+            setnotificationscount(response.data.unread_count);
+          }
+        }
+      );
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
   const getAdminDetails = async () => {
     try {
       await ApiService.post("/admin/getAdminDetails", {}).then(
@@ -56,7 +71,7 @@ const TopSideBar = () => {
     navigate("/myprofile");
   };
   const setting = () => {
-    navigate("/setting");
+    navigate("/settings");
   };
 
   const handleLogout = () => {
@@ -82,8 +97,14 @@ const TopSideBar = () => {
             <Search></Search>
             <input type="text" placeholder="Search anything"></input>
           </div>
-          <button className="btn_notification">
+          <button
+            className="btn_notification"
+            onClick={() => navigate("/notifications")}
+          >
             <Bell></Bell>
+            {notificationscount > 0 && (
+              <span className="notification_count">{notificationscount}</span>
+            )}
           </button>
           <button className="btn_notification">
             <Mail></Mail>
@@ -104,18 +125,18 @@ const TopSideBar = () => {
             </button>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="#" onClick={myProfile}>
+                <a className="dropdown-item" onClick={myProfile}>
                   {" "}
                   <User></User> My Profile{" "}
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={setting}>
+                <a className="dropdown-item" onClick={setting}>
                   <Settings></Settings> Settings
                 </a>
               </li>
               <li>
-                <a className="dropdown-item" href="#" onClick={handleLogout}>
+                <a className="dropdown-item" onClick={handleLogout}>
                   <LogOut></LogOut> Log Out
                 </a>
               </li>
@@ -189,12 +210,7 @@ const TopSideBar = () => {
                 )}
               </Fragment>
             ))}
-            <li className="">
-              <Icons item="Settings" /> Settings
-            </li>
-            <li className="">
-              <Icons item="Bell" /> Notifications
-            </li>
+
             <li className="text-red" onClick={handleLogout}>
               <LogOut></LogOut>
               Log Out

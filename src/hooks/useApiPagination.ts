@@ -65,7 +65,7 @@ export const useApiPagination = ({
           store_id
         );
         const responseData = response.data || response;
-        console.log(response);
+        // console.log(response);
         setData(responseData.list || []);
         setTotalItems(responseData.pagination.total);
         setTotalPages(responseData.pagination.totalPages);

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Check, Edit, Eye, Plus, Trash, X } from 'react-feather';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import Table, { type TableColumn, type TableRow } from '../Table/Table';
-import { useTableSelection } from '../../hooks/useTableSelection';
-import ApiPagination from '../Pagination/ApiPagination';
-import { useApiPagination } from '../../hooks/useApiPagination';
-import Input from '../inputs/Input';
-import Textarea from '../inputs/Textarea';
-import Select from '../inputs/Select';
-import ApiService from '../../services/api';
-import dayjs from 'dayjs';
-import type { SettingsTabConfig, PolicyItem, DiscountCoupon } from '../../types/settings';
+import React, { useState } from "react";
+import { Check, Edit, Plus, Trash, X } from "react-feather";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import Table, { type TableColumn, type TableRow } from "../Table/Table";
+import { useTableSelection } from "../../hooks/useTableSelection";
+import ApiPagination from "../Pagination/ApiPagination";
+import { useApiPagination } from "../../hooks/useApiPagination";
+import Input from "../inputs/Input";
+import Textarea from "../inputs/Textarea";
+import Select from "../inputs/Select";
+import ApiService from "../../services/api";
+import dayjs from "dayjs";
+import type { SettingsTabConfig } from "../../types/settings";
+import TextEditor from "../inputs/TextEditor";
 
 interface SettingsTabProps {
   config: SettingsTabConfig;
@@ -26,30 +27,30 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
   // Create validation schema from config
   const validationSchema = yup.object().shape(
     config.formFields.reduce((acc, field) => {
-      let fieldSchema = yup.string();
-      
+      let fieldSchema: any = yup.string();
+
       if (field.required) {
         fieldSchema = fieldSchema.required(`${field.label} is required`);
       }
-      
-      if (field.type === 'number') {
-        fieldSchema = yup.number().positive('Must be a positive number');
+
+      if (field.type === "number") {
+        fieldSchema = yup.number().positive("Must be a positive number");
         if (field.required) {
           fieldSchema = fieldSchema.required(`${field.label} is required`);
         }
       }
-      
-      if (field.type === 'date') {
+
+      if (field.type === "date") {
         fieldSchema = yup.string();
         if (field.required) {
           fieldSchema = fieldSchema.required(`${field.label} is required`);
         }
       }
-      
+
       if (field.validation) {
         fieldSchema = field.validation;
       }
-      
+
       acc[field.name] = fieldSchema;
       return acc;
     }, {} as any)
@@ -74,7 +75,14 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
     endDate: string
   ) => {
     return await ApiService.post(config.apiEndpoint, {
-      filters: { search, startdate: startDate, enddate: endDate },
+      filters: {
+        search,
+        startdate: startDate,
+        enddate: endDate,
+        ...(config.label === "Discount Coupons"
+          ? {}
+          : { page_type: config.label }),
+      },
       sorters: {},
       pagination: {
         page: page.toString(),
@@ -104,8 +112,8 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
   const tableData: TableRow[] = items.map((item: any, index: number) => ({
     id: item._id || index,
     ...item,
-    created_on: dayjs(item.created_on).format('DD/MM/YYYY | HH:mm A'),
-    status: item.status || 'active',
+    created_on: dayjs(item.created_on).format("DD/MM/YYYY | HH:mm A"),
+    status: item.status || "active",
   }));
 
   // Selection hook
@@ -114,38 +122,42 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
 
   // Table columns from config
   const columns: TableColumn[] = [
-    ...config.columns.map(col => ({
+    ...config.columns.map((col) => ({
       key: col.key,
       label: col.label,
       sortable: col.sortable || false,
     })),
     {
-      key: 'actions',
-      label: 'Actions',
+      key: "actions",
+      label: "Actions",
     },
   ];
 
   // Custom cell renderer
   const renderCell = (column: TableColumn, row: TableRow, value: any) => {
-    const configColumn = config.columns.find(col => col.key === column.key);
-    
+    const configColumn = config.columns.find((col) => col.key === column.key);
+
     if (configColumn?.render) {
       return configColumn.render(value, row);
     }
-    
+
     switch (column.key) {
-      case 'status':
-        return <span className={`status ${value === 'active' ? 'in' : 'out'}`}>{value}</span>;
-      case 'actions':
+      case "status":
+        return (
+          <span className={`status ${value === "active" ? "in" : "out"}`}>
+            {value}
+          </span>
+        );
+      case "actions":
         return (
           <div className="acbtns">
-            <button onClick={() => handleView(row.id)}>
+            {/* <button onClick={() => handleView(row._id)}>
               <Eye />
-            </button>
-            <button onClick={() => handleEdit(row.id)}>
+            </button> */}
+            <button onClick={() => handleEdit(row._id)}>
               <Edit />
             </button>
-            <button onClick={() => handleDelete(row.id)}>
+            <button onClick={() => handleDelete(row._id)}>
               <Trash />
             </button>
           </div>
@@ -183,8 +195,8 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
     if (item) {
       setEditingItem(item);
       // Populate form with item data
-      config.formFields.forEach(field => {
-        setValue(field.name, item[field.name] || '');
+      config.formFields.forEach((field) => {
+        setValue(field.name, item[field.name] || "");
       });
       setShowModal(true);
     }
@@ -193,51 +205,69 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
   const handleView = (id: string | number) => {
     const item = items.find((item: any) => item._id === id);
     if (item) {
-      alert(`Viewing: ${item.title || item.coupon_name || item.name}`);
+      alert(`Viewing: ${item.content}`);
     }
   };
 
   const handleDelete = async (id: string | number) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (window.confirm("Are you sure you want to delete this item?")) {
       try {
-        await ApiService.post(config.deleteEndpoint, { id });
+        await ApiService.post(config.deleteEndpoint, {
+          page_id: id,
+          coupon_id: id,
+        });
         refresh();
-        alert('Item deleted successfully');
+        alert("Item deleted successfully");
       } catch (error: any) {
-        alert(error.response?.data?.message || 'Error deleting item');
+        alert(error.response?.data?.message || "Error deleting item");
       }
     }
   };
 
   const handleBulkDelete = async () => {
-    if (window.confirm(`Are you sure you want to delete ${getSelectedCount()} items?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${getSelectedCount()} items?`
+      )
+    ) {
       try {
-        await ApiService.post(config.deleteEndpoint, { 
-          ids: selectedRows 
+        await ApiService.post(config.deleteEndpoint, {
+          page_id: selectedRows,
+          coupon_id: selectedRows,
         });
         refresh();
-        alert('Items deleted successfully');
+        alert("Items deleted successfully");
       } catch (error: any) {
-        alert(error.response?.data?.message || 'Error deleting items');
+        alert(error.response?.data?.message || "Error deleting items");
       }
     }
   };
 
   const onSubmit = async (data: any) => {
     setLoading(true);
+
     try {
-      const endpoint = editingItem ? config.updateEndpoint : config.createEndpoint;
-      const submitData = editingItem ? { ...data, id: editingItem._id } : data;
-      
+      const endpoint = editingItem
+        ? config.updateEndpoint
+        : config.createEndpoint;
+      const submitData = editingItem
+        ? {
+            ...data,
+            page_id: editingItem._id,
+            coupon_id: editingItem._id,
+            page_type: config.label,
+          }
+        : { ...data, page_type: config.label };
+
       await ApiService.post(endpoint, submitData);
-      
+
       setShowModal(false);
       reset();
       setEditingItem(null);
       refresh();
-      alert(`Item ${editingItem ? 'updated' : 'created'} successfully`);
+      alert(`Item ${editingItem ? "updated" : "created"} successfully`);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Error saving item');
+      alert(error.response?.data?.message || "Error saving item");
     } finally {
       setLoading(false);
     }
@@ -263,7 +293,10 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
               disabled={getSelectedCount() === 0 || dataLoading}
               style={{
                 opacity: getSelectedCount() === 0 || dataLoading ? 0.5 : 1,
-                cursor: getSelectedCount() === 0 || dataLoading ? 'not-allowed' : 'pointer',
+                cursor:
+                  getSelectedCount() === 0 || dataLoading
+                    ? "not-allowed"
+                    : "pointer",
               }}
             >
               <Trash />
@@ -279,9 +312,9 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
           <div
             className="alert alert-danger"
             style={{
-              fontSize: '12px',
-              padding: '8px',
-              marginBottom: '15px',
+              fontSize: "12px",
+              padding: "8px",
+              marginBottom: "15px",
             }}
           >
             {error}
@@ -315,7 +348,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
       {showModal && (
         <div
           className="modal fade show"
-          style={{ display: 'block' }}
+          style={{ display: "block" }}
           id="settingsModal"
           aria-labelledby="settingsModalLabel"
           aria-hidden="true"
@@ -324,7 +357,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="settingsModalLabel">
-                  {editingItem ? 'Edit' : 'Add'} {config.label}
+                  {editingItem ? "Edit" : "Add"} {config.label}
                 </h5>
               </div>
               <div className="modal-body">
@@ -332,22 +365,22 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
                   <div className="row">
                     {config.formFields.map((field) => (
                       <div key={field.name} className="col-md-6 pt-3">
-                        {field.type === 'textarea' ? (
-                          <Textarea
+                        {field.type === "textarea" ? (
+                          <TextEditor
                             control={control}
                             name={field.name}
                             label={field.label}
                             placeholder={`Enter ${field.label.toLowerCase()}`}
-                            error={errors[field.name]?.message}
-                            disabled={loading}
+                            //   error={errors[field.name]?.message?.toString()}
+                            //   disabled={loading}
                           />
-                        ) : field.type === 'select' ? (
+                        ) : field.type === "select" ? (
                           <Select
                             control={control}
                             name={field.name}
                             label={field.label}
                             options={field.options || []}
-                            error={errors[field.name]?.message}
+                            error={errors[field.name]?.message?.toString()}
                             disabled={loading}
                           />
                         ) : (
@@ -357,7 +390,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
                             label={field.label}
                             type={field.type}
                             placeholder={`Enter ${field.label.toLowerCase()}`}
-                            error={errors[field.name]?.message}
+                            error={errors[field.name]?.message?.toString()}
                             disabled={loading}
                           />
                         )}
@@ -381,7 +414,7 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
                   onClick={handleSubmit(onSubmit)}
                   disabled={loading}
                 >
-                  <Check /> {loading ? 'Saving...' : 'Save'}
+                  <Check /> {loading ? "Saving..." : "Save"}
                 </button>
               </div>
             </div>
