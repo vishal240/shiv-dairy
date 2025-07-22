@@ -32,6 +32,7 @@ const TextEditor = ({ control, name, label, error, ...rest }: InputProps) => {
             editor={ClassicEditor}
             data={field.value || ""}
             config={{
+              licenseKey: 'GPL',
               toolbar: [
                 "heading",
                 "bold",
