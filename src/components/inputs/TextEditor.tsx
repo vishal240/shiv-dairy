@@ -2,7 +2,6 @@ import { Controller } from "react-hook-form";
 import { type InputHTMLAttributes } from "react";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import { useState } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   control: any;
@@ -12,13 +11,6 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const TextEditor = ({ control, name, label, error, ...rest }: InputProps) => {
-  const [editorData, setEditorData] = useState("");
-
-  const handleEditorChange = (event: any, editor: any) => {
-    setEditorData(editor.getData());
-    control.setValue(editor.getData());
-  };
-
   return (
     <div className="mb-4">
       <label htmlFor={name} className="lbl">
@@ -65,7 +57,9 @@ const TextEditor = ({ control, name, label, error, ...rest }: InputProps) => {
               ],
               placeholder: "Start writing here...",
             }}
-            onChange={handleEditorChange}
+            onChange={(event, editor) => {
+              field.onChange(editor.getData());
+            }}
           />
         )}
       />
