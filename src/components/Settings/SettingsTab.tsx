@@ -64,6 +64,16 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ config }) => {
     setValue,
   } = useForm({
     resolver: yupResolver(validationSchema),
+    defaultValues: config.formFields.reduce((acc, field) => {
+      if (field.type === "number") {
+        acc[field.name] = 0;
+      } else if (field.type === "date") {
+        acc[field.name] = "";
+      } else {
+        acc[field.name] = "";
+      }
+      return acc;
+    }, {} as any),
   });
 
   // API call function

@@ -98,6 +98,18 @@ const Myprofile = () => {
     setValue,
   } = useForm<ProfileFormData>({
     resolver: yupResolver(profileSchema) as any,
+    defaultValues: {
+      admin_name: "",
+      email: "",
+      country_code: "",
+      phone_number: "",
+      address: "",
+      city: "",
+      state: "",
+      zip: "",
+      country: "",
+      profile_image: null,
+    },
   });
 
   const {
@@ -108,6 +120,11 @@ const Myprofile = () => {
     setValue: passwordSetValue,
   } = useForm<ProfileFormData>({
     resolver: yupResolver(passwordSchema) as any,
+    defaultValues: {
+      old_password: "",
+      new_password: "",
+      confirm_password: "",
+    },
   });
 
   useEffect(() => {

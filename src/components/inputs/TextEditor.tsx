@@ -61,7 +61,6 @@ const TextEditor = ({ control, name, label, error, ...rest }: InputProps) => {
                 "removeFormat",
                 "subscript",
                 "superscript",
-                "sourceEditing",
               ],
               placeholder: "Start writing here...",
             }}

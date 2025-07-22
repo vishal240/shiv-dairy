@@ -51,6 +51,8 @@ const AddPurchase = () => {
   } = useForm<PurchaseFormData>({
     resolver: yupResolver(purchaseSchema) as any,
     defaultValues: {
+      store_id: "",
+      purchase_date: "",
       products: [
         {
           product_id: "",

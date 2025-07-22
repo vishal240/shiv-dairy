@@ -73,6 +73,7 @@ const ImageUpload = ({ control, name, label, error, multiple = false }: ImageUpl
                 className="file_npt"
                 accept="image/*"
                 multiple={multiple}
+                value=""
                 onChange={(e) => handleFileChange(e.target.files, onChange)}
               />
             </div>

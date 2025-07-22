@@ -50,6 +50,10 @@ const AddCategories = () => {
     setValue,
   } = useForm<CategoryFormData>({
     resolver: yupResolver(storeSchema as any),
+    defaultValues: {
+      product_category_name: "",
+      product_sub_category_name: "",
+    },
   });
 
   const onSubmit = (data: CategoryFormData) => {

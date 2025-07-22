@@ -28,6 +28,11 @@ const AddBrands = () => {
     setValue,
   } = useForm<Brand>({
     resolver: yupResolver(storeSchema as any),
+    defaultValues: {
+      brand_name: "",
+      description: "",
+      brand_image: null,
+    },
   });
 
   const { id } = useParams();
